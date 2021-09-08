@@ -1,0 +1,5 @@
+-dce no
+-js ../www/lapopie.js
+-lib jQueryExtern
+-main Game
+
