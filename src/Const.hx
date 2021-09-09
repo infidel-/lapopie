@@ -72,4 +72,13 @@ class Const
         r += 1 + Std.random(y);
       return r;
     }
+
+// replace special symbols with HTML
+  public static function replaceSpecial(s: String): String
+    {
+      s = StringTools.replace(s, '<', '&lt;');
+      s = StringTools.replace(s, '>', '&gt;');
+      return s;
+    }
 }
+

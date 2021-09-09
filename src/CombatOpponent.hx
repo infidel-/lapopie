@@ -115,26 +115,34 @@ class CombatOpponent
     {
       // move action
       if (declaredAction == ACTION_MOVE)
-        actionMove(segment);
+        actionMove(segment, false);
+      else if (declaredAction == ACTION_CHARGE)
+        {
+          if (actionMove(segment, true))
+            actionAttack(segment, true);
+        }
       else if (declaredAction == ACTION_WAIT)
         {
           log(segment, nameCapped + ' cautiously wait' +
             (isPlayer ? '' : 's') + '.');
         }
       else if (declaredAction == ACTION_ATTACK)
-        actionAttack(segment);
+        actionAttack(segment, false);
       
       declaredAction = ACTION_WAIT;
     }
 
-// move opponent to target
-  function actionMove(segment: Int)
+// move/charge opponent to target
+// returns true on success
+  function actionMove(segment: Int, isCharge: Bool): Bool
     {
       var move = 0;
       if (type == COMBAT_MONSTER)
         move = monster.move;
       else if (type == COMBAT_PARTY_MEMBER || type == COMBAT_NPC)
         move = character.move;
+      if (isCharge)
+        move *= 2;
 
       // check if someone from the other side got close already
       var hasEnemyClose = false;
@@ -148,7 +156,7 @@ class CombatOpponent
         {
           log(segment, nameCapped + ' cautiously wait' +
             (isPlayer ? '' : 's') + '.');
-          return;
+          return false;
         }
 
       var target = combat.getFirstGroupOpponent(targetGroup);
@@ -180,14 +188,18 @@ class CombatOpponent
           var targetOp = combat.getFirstGroupOpponent(targetGroup);
           targetStr = targetOp.name;
         }
-      log(segment, nameCapped + ' close' + (isPlayer ? '' : 's') +
+      log(segment, nameCapped + ' ' +
+        (isCharge ? 'charge' : 'close') +
+        (isPlayer ? '' : 's') +
         ' into combat ' +
         (move > 0 ? ' (' + move + '\')' : '') +
         ' with ' + targetStr + '.');
+      return true;
     }
 
 // attack random opponent in the same group
-  function actionAttack(segment: Int)
+// can be called after charge
+  function actionAttack(segment: Int, isCharge: Bool)
     {
       // get a list of live opponents in the same group
       var targets = [];
@@ -200,10 +212,13 @@ class CombatOpponent
       // all opponents are dead already
       if (targets.length == 0)
         {
-          log(segment, nameCapped + ' cautiously wait' +
-            (isPlayer ? '' : 's') + '.');
+          if (!isCharge)
+            log(segment, nameCapped + ' cautiously wait' +
+              (isPlayer ? '' : 's') + '.');
           return;
         }
+      if (isCharge)
+        lastChargeRound = combat.round;
 
       // pick random target and attack
       var target = targets[Std.random(targets.length)];
@@ -214,9 +229,11 @@ class CombatOpponent
             targetAC);
           for (atk in 0...monster.attacks)
             {
-              var roll = Const.dice(1, 20);
+              var roll = Const.dice(1, 20) +
+                (isCharge ? 2 : 0);
               var ext = ' [rolls ' + roll + ' vs ' + thac + ' (AC ' +
-                targetAC + ')' + ']';
+                targetAC + ')' +
+                (isCharge ? ' +2 to hit from charge' : '') + ']';
               if (roll < thac)
                 {
                   log(segment, nameCapped + ' ' +
@@ -253,7 +270,8 @@ class CombatOpponent
           var thac = character.classTables.thac(character.level,
             targetAC);
           var roll = Const.dice(1, 20) +
-            character.strStats.toHitBonus;
+            character.strStats.toHitBonus +
+            (isCharge ? 2 : 0);
           var ext = ' [rolls ' + roll + ' vs ' + thac + ' (AC ' +
             targetAC + ')';
           if (character.strStats.toHitBonus != 0)
@@ -261,8 +279,10 @@ class CombatOpponent
               if (character.strStats.toHitBonus > 0)
                 ext += ', +' + character.strStats.toHitBonus;
               else ext += ', ' + character.strStats.toHitBonus;
-              ext += ' to hit';
+              ext += ' from STR';
             }
+          if (isCharge)
+            ext += ', +2 from charge';
           ext += ']';
 
           if (roll < thac)
@@ -310,8 +330,8 @@ class CombatOpponent
   function log(segment: Int, s: String)
     {
       if (combat.logSegment != segment)
-        combat.logTurn += 'S' + segment + ':\n';
-      combat.logTurn += '&nbsp;&nbsp;' + s + '\n';
+        combat.logRound += 'S' + segment + ':\n';
+      combat.logRound += '&nbsp;&nbsp;' + s + '\n';
       combat.logSegment = segment;
     }
 

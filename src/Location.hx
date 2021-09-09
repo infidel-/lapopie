@@ -210,6 +210,7 @@
   public static var commandHelp = [
     'examine' => 'examine, x, look, l <object> - Examines the given object. If no object is given, describes the scene.',
     'look' => 'examine, x, look, l <object> - Examines the given object. If no object is given, describes the scene.',
-    'roll' => 'roll, r <skill> on <object> - Roll a skill on a given object.',
+    'wait' => 'wait, z - Waits for one round.',
+//    'roll' => 'roll, r <skill> on <object> - Roll a skill on a given object.',
   ];
 }

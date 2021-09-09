@@ -88,12 +88,10 @@ class Console
               if (game.state == STATE_LOCATION)
                 s += 'Location commands: ' +
                   'enter, examine (x), exit, go, ' +
-                  'look (l), roll (r), talk (t), use (u)';
-              else if (game.state == STATE_CHAT)
-                s += 'Conversation commands: ' +
-                  'chat (c), discuss (d), evaluate (e), ' +
-                  'examine (x), exit, ' +
-                  'look (l), probe (p), roll (r), use (u)';
+                  'look (l), roll (r), talk (t), use (u), wait (z)';
+              else if (game.state == STATE_COMBAT)
+                s += 'Combat commands: ' +
+                  'attack (a), close, move (m), wait (z)';
               system(s);
             }
           else
@@ -103,14 +101,14 @@ class Console
                 {
                   if (game.state == STATE_LOCATION)
                     text = Location.commandHelp[tokens[0]];
-/*
-                  else if (game.state == STATE_CHAT)
-                    text = NPC.commandHelp[tokens[0]];
-*/
-
+                  else if (game.state == STATE_COMBAT)
+                    text = Combat.commandHelp[tokens[0]];
                 }
               if (text != null)
-                system(text);
+                {
+                  text = Const.replaceSpecial(text);
+                  system(text);
+                }
               else system('There is no such command or no help available.');
             }
           return 1;

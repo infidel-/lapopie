@@ -6,7 +6,7 @@ class Combat
   public var opponents: Array<CombatOpponent>;
   public var player: CombatOpponent;
   public var round: Int;
-  public var logTurn: String; // actions log for each turn
+  public var logRound: String; // actions log for each turn
   public var logSegment: Int; // last log segment
 
   public function new(g: Game)
@@ -14,7 +14,7 @@ class Combat
       game = g;
       opponents = [];
       round = 1;
-      logTurn = '';
+      logRound = '';
       logSegment = 0;
     }
 
@@ -163,6 +163,57 @@ class Combat
           player.declaredAction = ACTION_WAIT;
         }
 
+      // attack
+      else if (cmd == 'attack' || cmd == 'atk' || cmd == 'a')
+        {
+          if (getGroupEnemies(player.group, player.isEnemy) == 0)
+            {
+              game.console.print('There are no enemies close to you.');
+              return -1;
+            }
+          player.declaredAction = ACTION_ATTACK;
+        }
+
+      // charge
+      else if (cmd == 'charge' || cmd == 'ch')
+        {
+          if (tokens.length == 0 || tokens[0].length > 1)
+            {
+              game.console.print('Usage: charge &lt;group letter&gt;');
+              return -1;
+            }
+
+          var group = tokens[0].charCodeAt(0);
+          // A-Z
+          if (group >= 65 && group <= 90)
+            group -= 65;
+          // a-z
+          else if (group >= 97 && group <= 122)
+            group -= 97;
+          if (player.group == group)
+            {
+              game.console.print('You are in that group.');
+              return -1;
+            }
+          if (getGroupMembers(group) == 0)
+            {
+              game.console.print('No such combat group.');
+              return -1;
+            }
+          if (getGroupEnemies(group, player.isEnemy) == 0)
+            {
+              game.console.print('That group has no opponents.');
+              return -1;
+            }
+          if (player.distanceToGroup(group) > player.character.move * 2)
+            {
+              game.console.print('That group is too far away.');
+              return -1;
+            }
+          player.declaredAction = ACTION_CHARGE;
+          player.targetGroup = group;
+        }
+
       // move
       else if (cmd == 'move' || cmd == 'm' || cmd == 'close')
         {
@@ -179,29 +230,18 @@ class Combat
           // a-z
           else if (group >= 97 && group <= 122)
             group -= 97;
-          if (getGroupMembers(group) == 0)
-            {
-              game.console.print('No such combat group.');
-              return -1;
-            }
           if (player.group == group)
             {
               game.console.print('You are in that group.');
               return -1;
             }
-          player.declaredAction = ACTION_MOVE;
-          player.targetGroup = group;
-        }
-
-      // attack
-      else if (cmd == 'attack' || cmd == 'atk' || cmd == 'a')
-        {
-          if (getGroupEnemies(player.group, player.isEnemy) == 0)
+          if (getGroupMembers(group) == 0)
             {
-              game.console.print('There are no enemies close to you.');
+              game.console.print('No such combat group.');
               return -1;
             }
-          player.declaredAction = ACTION_ATTACK;
+          player.declaredAction = ACTION_MOVE;
+          player.targetGroup = group;
         }
       else return 0;
 
@@ -230,7 +270,7 @@ class Combat
         playerRoll + ', enemy side ' + enemyRoll);
 
       // resolution
-      logTurn = '';
+      logRound = '';
       logSegment = 0;
       for (segment in 1...11)
         {
@@ -247,7 +287,7 @@ class Combat
                   op.resolveAction(segment);
             }
         }
-      game.console.print(logTurn);
+      game.console.print(logRound);
       round++;
 
       print();
@@ -271,4 +311,11 @@ class Combat
       game.console.printNarrative('Your first test is over, but many more await you in the future. Thank you for playing!');
       game.state = STATE_LOCATION;
     }
+
+  public static var commandHelp = [
+    'attack' => 'attack, a - Declare that the player wants to attack with a melee weapon.',
+    'charge' => 'charge, ch <group letter> - Declare that the player wants to charge into a given combat group.',
+    'move' => 'move, m, close <group letter> - Declare that the player wants to close distance to a given combat group.',
+    'wait' => 'wait, z - Declare that the player wait for one round.',
+  ];
 }
