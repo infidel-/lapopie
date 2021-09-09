@@ -36,7 +36,7 @@ class Combat
           op.name = op.monster.name + ' ' + letter;
           op.nameCapped = op.monster.nameCapped + ' ' + letter;
           op.group = maxGroup + 1;
-          op.distance = distance;
+          op.x = distance;
           op.isEnemy = true;
           op.init();
           opponents.push(op);
@@ -108,15 +108,13 @@ class Combat
           op.isEnemy = false;
           op.character = char;
           op.group = 0;
-          op.distance = 0;
+          op.x = 0;
           op.init();
           opponents.insert(0, op);
           if (char.isPlayer)
             {
               player = op;
               op.isPlayer = true;
-              // TODO: TEST!
-              char.move = 40;
             }
         }
 
@@ -132,13 +130,13 @@ class Combat
       game.console.print('Round ' + round);
       for (group in 0...maxGroup + 1)
         {
-          var distance = 0;
-          for (op in opponents)
-            if (op.group == group)
-              {
-                distance = op.distance;
-                break;
-              }
+          // find group x for 
+          var op = getFirstGroupOpponent(group);
+          if (op == null)
+            continue;
+          var distance = player.x - op.x;
+          if (distance < 0)
+            distance = - distance;
           var s = 'Group ' + String.fromCharCode(65 + group) +
             (distance > 0 ? ' (' + distance + "')" : '') + ':\n';
           for (op in opponents)
@@ -166,7 +164,7 @@ class Combat
         }
 
       // move
-      else if (cmd == 'move' || cmd == 'close')
+      else if (cmd == 'move' || cmd == 'm' || cmd == 'close')
         {
           if (tokens.length == 0 || tokens[0].length > 1)
             {
@@ -205,6 +203,7 @@ class Combat
             }
           player.declaredAction = ACTION_ATTACK;
         }
+      else return 0;
 
       // combat time passing
       turn();
@@ -252,8 +251,24 @@ class Combat
       round++;
 
       print();
+      checkFinish();
+    }
+
+// check for combat finish
+  function checkFinish()
+    {
       // game over
       if (player.isDead)
-        game.finish('loseHP');
+        {
+          game.finish('loseHP');
+          return;
+        }
+      // opponents dead, combat over
+      for (op in opponents)
+        if (op.isEnemy && !op.isDead)
+          return;
+      game.console.print('The battle is over. You are victorious.');
+      game.console.printNarrative('Your first test is over, but many more await you in the future. Thank you for playing!');
+      game.state = STATE_LOCATION;
     }
 }

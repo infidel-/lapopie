@@ -21,7 +21,7 @@ class CombatOpponent
   public var hp: Int;
   public var maxHP: Int;
   public var group: Int;
-  public var distance: Int;
+  public var x: Int;
 
   public function new(g: Game)
     {
@@ -32,7 +32,7 @@ class CombatOpponent
       hp = 0;
       maxHP = 0;
       group = 0;
-      distance = 0;
+      x = 0;
       declaredAction = ACTION_WAIT;
       targetGroup = 0;
       isPlayer = false;
@@ -60,7 +60,7 @@ class CombatOpponent
 // the player is in zero
   public function distanceToOpponent(op: CombatOpponent): Int
     {
-      var dst = op.distance - distance;
+      var dst = op.x - x;
       if (dst < 0)
         dst = - dst;
       return dst;
@@ -72,7 +72,7 @@ class CombatOpponent
   public function distanceToGroup(group: Int): Int
     {
       var op = combat.getFirstGroupOpponent(group);
-      var dst = op.distance - distance;
+      var dst = op.x - x;
       if (dst < 0)
         dst = - dst;
       return dst;
@@ -156,7 +156,7 @@ class CombatOpponent
       // NOTE: 10' is melee range
       if (dst <= move + 10) // add to target group
         {
-          distance = target.distance;
+          x = target.x;
           group = targetGroup;
           move = dst - 10;
           if (move < 0)
@@ -167,11 +167,11 @@ class CombatOpponent
           // separate into new group if not solo already
           if (combat.getGroupMembers(group) > 1)
             group = combat.getMaxGroup() + 1;
-          // move to player
-          if (target.distance < distance)
-            distance -= move;
-          // move away from player
-          else distance += move;
+          // target to the left
+          if (target.x < x)
+            x -= move;
+          // target to the right
+          else x += move;
         }
 
       var targetStr = ' group ' + String.fromCharCode(65 + targetGroup);
@@ -334,16 +334,22 @@ class CombatOpponent
               else if (perc < 100)
                 s += ' <span class=wounded99>(wounded)</span>';
             }
+          if (isDead)
+            s += '~~';
 #if mydebug
-          s += ' <span class=consoleDebug>[' + hp + '/' + maxHP + ' hp]</span>';
+          s += ' <span class=consoleDebug>[' +
+            hp + '/' + maxHP + ' hp]</span>';
 #end
         }
       else if (type == COMBAT_PARTY_MEMBER)
         {
           s += ' (' + hp + '/' + maxHP + ' hp)';
+          if (isDead)
+            s += '~~';
         }
-      if (isDead)
-        s += '~~';
+#if mydebug
+          s += ' <span class=consoleDebug>[x: ' + x + ']</span>';
+#end
       return s + '\n';
     }
 }
