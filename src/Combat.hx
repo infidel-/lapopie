@@ -210,6 +210,12 @@ class Combat
               game.console.print('That group is too far away.');
               return -1;
             }
+          if (round - player.lastChargeRound < 10)
+            {
+              game.console.print('You have to wait ' +
+                (10 - round + player.lastChargeRound) + ' more rounds before charging.');
+              return -1;
+            }
           player.declaredAction = ACTION_CHARGE;
           player.targetGroup = group;
         }

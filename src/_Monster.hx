@@ -7,6 +7,7 @@ typedef _Monster = {
   var ac: Int;
   var hitDice: Array<Int>;
   var attacks: Int;
+  var attackNames: Array<String>;
   var damage: Array<Array<Int>>;
   var level: Int;
   var xp: Int;

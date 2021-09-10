@@ -14,6 +14,7 @@ class CombatOpponent
   public var isDead: Bool;
   public var declaredAction: _CombatAction;
   public var targetGroup: Int;
+  public var lastChargeRound: Int;
 
   // common vars
   public var name: String;
@@ -33,6 +34,7 @@ class CombatOpponent
       maxHP = 0;
       group = 0;
       x = 0;
+      lastChargeRound = -10;
       declaredAction = ACTION_WAIT;
       targetGroup = 0;
       isPlayer = false;
@@ -107,7 +109,12 @@ class CombatOpponent
       targetGroup = tgt.group;
       if (distanceToOpponent(tgt) <= 10)
         declaredAction = ACTION_ATTACK;
-      else declaredAction = ACTION_MOVE;
+      else
+        {
+          if (Std.random(100) > 70)
+            declaredAction = ACTION_CHARGE;
+          else declaredAction = ACTION_MOVE;
+        }
     }
 
 // opponent action resolution
@@ -222,6 +229,17 @@ class CombatOpponent
 
       // pick random target and attack
       var target = targets[Std.random(targets.length)];
+/*
+      // target will get a pre-counterattack if weapon length allows
+      if (isCharge && 
+          (target.type == COMBAT_NPC ||
+           target.type == COMBAT_PARTY_MEMBER) &&
+          (type == COMBAT_NPC || type == COMBAT_PARTY_MEMBER) &&
+          target.meleeWeapon.length > meleeWeapon.length)
+        {
+          target.actionAttack(segment, false);
+        }
+*/
       var targetAC = target.getAC();
       if (type == COMBAT_MONSTER)
         {
@@ -229,6 +247,7 @@ class CombatOpponent
             targetAC);
           for (atk in 0...monster.attacks)
             {
+              var atkName = monster.attackNames[atk];
               var roll = Const.dice(1, 20) +
                 (isCharge ? 2 : 0);
               var ext = ' [rolls ' + roll + ' vs ' + thac + ' (AC ' +
@@ -237,8 +256,8 @@ class CombatOpponent
               if (roll < thac)
                 {
                   log(segment, nameCapped + ' ' +
-                    (isPlayer ? 'try' : 'tries') + ' to attack ' +
-                    target.name + ', but miss' +
+                    (isPlayer ? 'try' : 'tries') + ' to ' + atkName +
+                    ' ' + target.name + ', but miss' +
                     (isPlayer ? '' : 'es') + '.' +
                     (game.extendedInfo ? ext : ''));
                   continue;
@@ -251,7 +270,7 @@ class CombatOpponent
                 (row[2] > 0 ? '+' + row[2] : '') + 
                 (row[2] < 0 ? '' + row[2] : '') + ' = ' + dmg + ']';
 
-              log(segment, nameCapped + ' attack' +
+              log(segment, nameCapped + ' ' + atkName +
                 (isPlayer ? '' : 's') + ' ' +
                 target.name + ' for ' + dmg + ' damage.' +
                 (game.extendedInfo ? ext : ''));
@@ -288,7 +307,8 @@ class CombatOpponent
           if (roll < thac)
             {
               log(segment, nameCapped + ' ' +
-                (isPlayer ? 'try' : 'tries') + ' to attack ' +
+                (isPlayer ? 'try' : 'tries') + ' to ' +
+                character.meleeWeapon.attackName + ' ' +
                 target.name + ', but miss' +
                 (isPlayer ? '' : 'es') + '.' +
                 (game.extendedInfo ? ext : ''));
@@ -306,8 +326,10 @@ class CombatOpponent
             (row[2] < 0 ? '' + row[2] : '') +
             ' = ' + dmg + ']';
 
-          log(segment, nameCapped + ' attack' +
-            (isPlayer ? '' : 's') + ' ' +
+          log(segment, nameCapped + ' ' +
+            (isPlayer ?
+             character.meleeWeapon.attackName :
+             character.meleeWeapon.attackName2) + ' ' +
             target.name + ' for ' + dmg + ' damage.' +
             (game.extendedInfo ? ext : ''));
           target.hp -= dmg;

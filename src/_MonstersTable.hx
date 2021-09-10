@@ -10,6 +10,7 @@ class _MonstersTable
       ac: 7,
       hitDice: [ 1, 8, 0 ], // XdY+Z
       attacks: 1,
+      attackNames: [ 'bite' ],
       damage: [ [ 1, 4, 0 ] ], // array of XdY+Z
       level: 1,
       xp: 10,
