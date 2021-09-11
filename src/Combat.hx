@@ -64,12 +64,23 @@ class Combat
       return maxGroup;
     }
 
+// helper: get min free group on the field
+  public function getMinFreeGroup(): Int
+    {
+      // get max group
+      var maxGroup = getMaxGroup();
+      for (group in 0...maxGroup)
+        if (getGroupMembers(group) == 0)
+          return group;
+      return maxGroup + 1;
+    }
+
 // helper: get group members count
   public function getGroupMembers(group: Int): Int
     {
       var cnt = 0;
       for (op in opponents)
-        if (op.group == group)
+        if (op.group == group && !op.isDead)
           cnt++;
       return cnt;
     }
@@ -79,7 +90,7 @@ class Combat
     {
       var cnt = 0;
       for (op in opponents)
-        if (op.group == group && op.isEnemy != isEnemy)
+        if (op.group == group && op.isEnemy != isEnemy && !op.isDead)
           cnt++;
       return cnt;
     }
@@ -220,6 +231,30 @@ class Combat
           player.targetGroup = group;
         }
 
+      // retreat
+      else if (cmd == 'retreat' || cmd == 'r')
+        {
+          if (getGroupEnemies(player.group, player.isEnemy) == 0)
+            {
+              game.console.print('You are not in combat.');
+              return -1;
+            }
+          player.isParrying = true;
+          player.declaredAction = ACTION_RETREAT;
+        }
+
+      // parry
+      else if (cmd == 'parry' || cmd == 'p')
+        {
+          if (player.character.meleeWeapon.id == 'unarmed')
+            {
+              game.console.print('You cannot parry without a melee weapon.');
+              return -1;
+            }
+          player.isParrying = true;
+          player.declaredAction = ACTION_PARRY;
+        }
+
       // move
       else if (cmd == 'move' || cmd == 'm' || cmd == 'close')
         {
@@ -296,6 +331,9 @@ class Combat
       game.console.print(logRound);
       round++;
 
+      // clear opponent state
+      for (op in opponents)
+        op.clear();
       print();
       checkFinish();
     }
@@ -319,9 +357,11 @@ class Combat
     }
 
   public static var commandHelp = [
-    'attack' => 'attack, a - Declare that the player wants to attack with a melee weapon.',
-    'charge' => 'charge, ch <group letter> - Declare that the player wants to charge into a given combat group.',
-    'move' => 'move, m, close <group letter> - Declare that the player wants to close distance to a given combat group.',
-    'wait' => 'wait, z - Declare that the player wait for one round.',
+    'attack' => 'attack, a - Declare that the player character wants to attack with a melee weapon.',
+    'charge' => 'charge, ch <group letter> - Declare that the player character wants to charge into a given combat group.',
+    'move' => 'move, m, close <group letter> - Declare that the player character wants to close distance to a given combat group.',
+    'parry' => 'parry, p - Declare that the player character wants to parry for this round.',
+    'retreat' => 'retreat, r - Declare that the player character wants to retreat from the current combat group. Parrying is enabled while retreating.',
+    'wait' => 'wait, z - Declare that the player character waits for one round.',
   ];
 }

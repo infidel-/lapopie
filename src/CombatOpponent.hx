@@ -12,6 +12,8 @@ class CombatOpponent
   public var isPlayer: Bool;
   public var isEnemy: Bool;
   public var isDead: Bool;
+  public var isParrying: Bool;
+  public var wasAttacked: Bool;
   public var declaredAction: _CombatAction;
   public var targetGroup: Int;
   public var lastChargeRound: Int;
@@ -38,8 +40,17 @@ class CombatOpponent
       declaredAction = ACTION_WAIT;
       targetGroup = 0;
       isPlayer = false;
+      isParrying = false;
       isEnemy = false;
       isDead = false;
+      wasAttacked = false;
+    }
+
+// clear state
+  public function clear()
+    {
+      wasAttacked = false;
+      isParrying = false;
     }
 
 // init opponent vars
@@ -135,19 +146,59 @@ class CombatOpponent
         }
       else if (declaredAction == ACTION_ATTACK)
         actionAttack(segment, false);
-      
+
+      else if (declaredAction == ACTION_PARRY)
+        {
+          if (wasAttacked)
+            log(segment, nameCapped + ' ' +
+              (isPlayer ? 'try' : 'tries') + ' to parry incoming enemy attacks.');
+          else log(segment, nameCapped + ' stand' +
+            (isPlayer ? '' : 's') + ' ready to parry enemy attacks.');
+        }
+
+      else if (declaredAction == ACTION_RETREAT)
+        actionRetreat(segment);
+
       declaredAction = ACTION_WAIT;
+    }
+
+// retreat from combat
+  function actionRetreat(segment: Int)
+    {
+      // cannot retreat if no friends are in the group
+      if (combat.getGroupEnemies(group, isEnemy) > 0 &&
+          combat.getGroupEnemies(group, !isEnemy) == 1)
+        {
+          log(segment, nameCapped + ' do' +
+            (isPlayer ? '' : 'es') + ' not manage to retreat from combat.');
+          return;
+        }
+
+      // find which way is "out"
+      var minx = 10000, maxx = 0;
+      for (op in combat.opponents)
+        {
+          if (op.x < minx)
+            minx = op.x;
+          if (op.x > maxx)
+            maxx = op.x;
+        }
+      var move = Std.int(getMove() / 2);
+      move -= move % 10;
+      if (x - minx > maxx - x)
+        x -= move;
+      else x += move;
+      group = combat.getMinFreeGroup();
+      log(segment, nameCapped + ' retreat' +
+        (isPlayer ? '' : 's') + ' from combat ' +
+        (move > 0 ? ' (' + move + '\')' : '') + '.');
     }
 
 // move/charge opponent to target
 // returns true on success
   function actionMove(segment: Int, isCharge: Bool): Bool
     {
-      var move = 0;
-      if (type == COMBAT_MONSTER)
-        move = monster.move;
-      else if (type == COMBAT_PARTY_MEMBER || type == COMBAT_NPC)
-        move = character.move;
+      var move = getMove();
       if (isCharge)
         move *= 2;
 
@@ -229,6 +280,7 @@ class CombatOpponent
 
       // pick random target and attack
       var target = targets[Std.random(targets.length)];
+      target.wasAttacked = true;
 /*
       // target will get a pre-counterattack if weapon length allows
       if (isCharge && 
@@ -238,9 +290,19 @@ class CombatOpponent
           target.meleeWeapon.length > meleeWeapon.length)
         {
           target.actionAttack(segment, false);
+          isDead
         }
 */
       var targetAC = target.getAC();
+      var parryBonus = 0;
+      if ((target.type == COMBAT_NPC ||
+          target.type == COMBAT_PARTY_MEMBER) &&
+          target.isParrying)
+        {
+          parryBonus = - 2 - target.character.strStats.toHitBonus;
+          if (parryBonus > 0)
+            parryBonus = 0;
+        }
       if (type == COMBAT_MONSTER)
         {
           var thac = _TablesFighter.instance.thac(monster.level,
@@ -249,10 +311,13 @@ class CombatOpponent
             {
               var atkName = monster.attackNames[atk];
               var roll = Const.dice(1, 20) +
-                (isCharge ? 2 : 0);
+                (isCharge ? 2 : 0) +
+                parryBonus;
               var ext = ' [rolls ' + roll + ' vs ' + thac + ' (AC ' +
                 targetAC + ')' +
-                (isCharge ? ' +2 to hit from charge' : '') + ']';
+                (isCharge ? ', +2 from charge' : '') +
+                (target.isParrying ? ', ' + parryBonus + ' from parry' : '') +
+                ']';
               if (roll < thac)
                 {
                   log(segment, nameCapped + ' ' +
@@ -302,6 +367,8 @@ class CombatOpponent
             }
           if (isCharge)
             ext += ', +2 from charge';
+          if (target.isParrying)
+            ext += ', ' + parryBonus + ' from parry';
           ext += ']';
 
           if (roll < thac)
@@ -336,6 +403,16 @@ class CombatOpponent
           if (target.hp <= 0)
             target.isDead = true;
         }
+    }
+
+// helper: returns current opponent move
+  function getMove(): Int
+    {
+      if (type == COMBAT_MONSTER)
+        return monster.move;
+      else if (type == COMBAT_PARTY_MEMBER || type == COMBAT_NPC)
+        return character.move;
+      return 0;
     }
 
 // helper: returns current opponent AC

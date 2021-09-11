@@ -91,7 +91,7 @@ class Console
                   'look (l), roll (r), talk (t), use (u), wait (z)';
               else if (game.state == STATE_COMBAT)
                 s += 'Combat commands: ' +
-                  'attack (a), close, move (m), wait (z)';
+                  'attack (a), close, move (m), retreat (r), parry (p), wait (z)';
               system(s);
             }
           else

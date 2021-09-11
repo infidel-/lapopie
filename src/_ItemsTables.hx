@@ -325,6 +325,7 @@ class _ItemsTables
       attackName2: 'slashes',
       damageVsMedium: [ 2, 4, 0 ], // XdY+Z
       damageVsLarge: [ 2, 8, 0 ], // XdY+Z
+      length: 5,
       weight: 10,
       cost: 2500,
     },
