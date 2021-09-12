@@ -236,7 +236,7 @@ class Combat
         {
           if (getGroupEnemies(player.group, player.isEnemy) == 0)
             {
-              game.console.print('You are not in combat.');
+              game.console.print('You are not actively fighting.');
               return -1;
             }
           player.isParrying = true;
@@ -356,12 +356,105 @@ class Combat
       game.state = STATE_LOCATION;
     }
 
-  public static var commandHelp = [
-    'attack' => 'attack, a - Declare that the player character wants to attack with a melee weapon.',
-    'charge' => 'charge, ch <group letter> - Declare that the player character wants to charge into a given combat group.',
-    'move' => 'move, m, close <group letter> - Declare that the player character wants to close distance to a given combat group.',
-    'parry' => 'parry, p - Declare that the player character wants to parry for this round.',
-    'retreat' => 'retreat, r - Declare that the player character wants to retreat from the current combat group. Parrying is enabled while retreating.',
-    'wait' => 'wait, z - Declare that the player character waits for one round.',
+// get commands list for help command
+  public function getCommandList(): String
+    {
+      var s = 'Combat commands: ';
+      for (c in commands)
+        {
+          for (v in 0...c.variants.length)
+            {
+              if (v == 0)
+                s += c.variants[v] + ' (';
+              else s += c.variants[v] + ', ';
+            }
+          s = s.substr(0, s.length - 2) + '), ';
+        }
+      s = s.substr(0, s.length - 2);
+      return s;
+    }
+
+// get command help string
+  public static function getCommandHelp(cmds: String): String
+    {
+      // find command
+      var cmd = null;
+      for (c in commands)
+        {
+          for (v in c.variants)
+            if (cmds == v)
+              {
+                cmd = c;
+                break;
+              }
+          if (cmd != null)
+            break;
+        }
+      if (cmd == null)
+        return null;
+
+      // form string
+      var s = '';
+      for (v in cmd.variants)
+        s += v + ', ';
+      s = s.substr(0, s.length - 2) +
+        (cmd.args != null ? ' ' + cmd.args : '') +
+        ' - ' + cmd.help;
+
+      return s;
+    }
+
+  public static var commands: Array<_CombatCommand> = [
+    {
+      id: 'attack',
+      variants: [ 'attack', 'a' ],
+      help: 'Declare that the player character wants to attack with a melee weapon.',
+    },
+    {
+      id: 'charge',
+      args: '<group letter>',
+      variants: [ 'charge', 'ch' ],
+      help: 'Declare that the player character wants to charge into a given combat group.',
+    },
+    {
+      id: 'draw',
+      variants: [ 'draw', 'd' ],
+      args: '<item letter>',
+      help: 'Draw another weapon from inventory. Shows a list of weapons without arguments.',
+    },
+    {
+      id: 'move',
+      variants: [ 'move', 'm', 'close', 'cl' ],
+      args: '<group letter>',
+      help: 'Declare that the player character wants to close distance to a given combat group.',
+    },
+    {
+      id: 'parry',
+      variants: [ 'parry', 'p' ],
+      help: 'Declare that the player character wants to parry for this round.',
+    },
+    {
+      id: 'retreat',
+      variants: [ 'retreat', 'r' ],
+      help: 'Declare that the player character wants to retreat from the current combat group. Parrying is enabled while retreating.',
+    },
+    {
+      id: 'shoot',
+      args: '<group letter>',
+      variants: [ 'shoot', 's' ],
+      help: 'Declare that the player character wants to shoot into a given combat group.',
+    },
+    {
+      id: 'wait',
+      variants: [ 'wait', 'z' ],
+      help: 'Declare that the player character waits for one round.',
+    },
   ];
+}
+
+typedef _CombatCommand = {
+  var id: String;
+  var variants: Array<String>;
+  @:optional var args: String;
+  var help: String;
 }

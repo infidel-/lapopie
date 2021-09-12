@@ -90,8 +90,7 @@ class Console
                   'enter, examine (x), exit, go, ' +
                   'look (l), roll (r), talk (t), use (u), wait (z)';
               else if (game.state == STATE_COMBAT)
-                s += 'Combat commands: ' +
-                  'attack (a), close, move (m), retreat (r), parry (p), wait (z)';
+                s += game.combat.getCommandList();
               system(s);
             }
           else
@@ -102,7 +101,7 @@ class Console
                   if (game.state == STATE_LOCATION)
                     text = Location.commandHelp[tokens[0]];
                   else if (game.state == STATE_COMBAT)
-                    text = Combat.commandHelp[tokens[0]];
+                    text = Combat.getCommandHelp(tokens[0]);
                 }
               if (text != null)
                 {
