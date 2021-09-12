@@ -60,7 +60,12 @@ class Console
           return ret;
         }
       else if (game.state == STATE_COMBAT)
-        return game.combat.runCommand(cmd, tokens, tokensFull);
+        {
+          var info = Combat.getCommandInfo(cmd);
+          if (info == null)
+            return 0;
+          return game.combat.runCommand(info.id, tokens, tokensFull);
+        }
 /*
       else if (game.state == STATE_CHAT)
         return game.npc.runCommand(cmd, tokens, tokensFull);

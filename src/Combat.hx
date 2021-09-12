@@ -169,13 +169,13 @@ class Combat
       tokensFull: Array<String>): Int
     {
       // wait
-      if (cmd == 'wait' || cmd == 'z')
+      if (cmd == 'wait')
         {
           player.declaredAction = ACTION_WAIT;
         }
 
       // attack
-      else if (cmd == 'attack' || cmd == 'atk' || cmd == 'a')
+      else if (cmd == 'attack')
         {
           if (getGroupEnemies(player.group, player.isEnemy) == 0)
             {
@@ -186,7 +186,7 @@ class Combat
         }
 
       // charge
-      else if (cmd == 'charge' || cmd == 'ch')
+      else if (cmd == 'charge')
         {
           if (tokens.length == 0 || tokens[0].length > 1)
             {
@@ -232,7 +232,7 @@ class Combat
         }
 
       // retreat
-      else if (cmd == 'retreat' || cmd == 'r')
+      else if (cmd == 'retreat')
         {
           if (getGroupEnemies(player.group, player.isEnemy) == 0)
             {
@@ -244,7 +244,7 @@ class Combat
         }
 
       // parry
-      else if (cmd == 'parry' || cmd == 'p')
+      else if (cmd == 'parry')
         {
           if (player.character.meleeWeapon.id == 'unarmed')
             {
@@ -256,7 +256,7 @@ class Combat
         }
 
       // move
-      else if (cmd == 'move' || cmd == 'm' || cmd == 'close')
+      else if (cmd == 'move')
         {
           if (tokens.length == 0 || tokens[0].length > 1)
             {
@@ -374,8 +374,8 @@ class Combat
       return s;
     }
 
-// get command help string
-  public static function getCommandHelp(cmds: String): String
+// get command info
+  public static function getCommandInfo(cmds: String): _CombatCommand
     {
       // find command
       var cmd = null;
@@ -390,6 +390,14 @@ class Combat
           if (cmd != null)
             break;
         }
+      return cmd;
+    }
+
+// get command help string
+  public static function getCommandHelp(cmds: String): String
+    {
+      // find command
+      var cmd = getCommandInfo(cmds);
       if (cmd == null)
         return null;
 
