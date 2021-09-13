@@ -80,5 +80,19 @@ class Const
       s = StringTools.replace(s, '>', '&gt;');
       return s;
     }
+
+// convert a-z into a number
+// returns -1 on error
+  public static function letterToNum(s: String): Int
+    {
+      var group = s.charCodeAt(0);
+      // A-Z
+      if (group >= 65 && group <= 90)
+        return group - 65;
+      // a-z
+      else if (group >= 97 && group <= 122)
+        return group - 97;
+      else return -1;
+    }
 }
 

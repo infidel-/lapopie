@@ -41,6 +41,11 @@ p {
   color: #ff0000;
 }
 
+.todo {
+  color: #ff0000;
+  font-weight: bold;
+}
+
 .rollSuccess {
   color: #33ee33;
 }

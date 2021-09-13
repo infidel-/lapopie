@@ -15,7 +15,7 @@ class CombatOpponent
   public var isParrying: Bool;
   public var wasAttacked: Bool;
   public var declaredAction: _CombatAction;
-  public var targetGroup: Int;
+  public var targetID: Int; // group id, inventory item id
   public var lastChargeRound: Int;
 
   // common vars
@@ -38,7 +38,7 @@ class CombatOpponent
       x = 0;
       lastChargeRound = -10;
       declaredAction = ACTION_WAIT;
-      targetGroup = 0;
+      targetID = 0;
       isPlayer = false;
       isParrying = false;
       isEnemy = false;
@@ -117,7 +117,7 @@ class CombatOpponent
           return;
         }
       
-      targetGroup = tgt.group;
+      targetID = tgt.group;
       if (distanceToOpponent(tgt) <= 10)
         declaredAction = ACTION_ATTACK;
       else
@@ -131,13 +131,27 @@ class CombatOpponent
 // opponent action resolution
   public function resolveAction(segment: Int)
     {
-      // move action
       if (declaredAction == ACTION_MOVE)
         actionMove(segment, false);
       else if (declaredAction == ACTION_CHARGE)
         {
           if (actionMove(segment, true))
             actionAttack(segment, true);
+        }
+      else if (declaredAction == ACTION_DRAW)
+        {
+          var item = character.inventory.getByID(targetID);
+          if (character.weapon.weapon.id != 'unarmed')
+            log(segment, nameCapped + ' sheathe' +
+              (isPlayer ? ' your ' : 's their ') +
+              character.weapon.getNameLower() +
+              ' and draw' +
+              (isPlayer ? '' : 's') + ' the ' +
+              item.getNameLower() + '.');
+          else log(segment, nameCapped + ' draw' +
+            (isPlayer ? '' : 's') + ' a ' +
+            item.getNameLower() + '.');
+          character.draw(item);
         }
       else if (declaredAction == ACTION_WAIT)
         {
@@ -217,13 +231,13 @@ class CombatOpponent
           return false;
         }
 
-      var target = combat.getFirstGroupOpponent(targetGroup);
+      var target = combat.getFirstGroupOpponent(targetID);
       var dst = distanceToOpponent(target);
       // NOTE: 10' is melee range
       if (dst <= move + 10) // add to target group
         {
           x = target.x;
-          group = targetGroup;
+          group = targetID;
           move = dst - 10;
           if (move < 0)
             move = 0;
@@ -240,10 +254,10 @@ class CombatOpponent
           else x += move;
         }
 
-      var targetStr = ' group ' + String.fromCharCode(65 + targetGroup);
-      if (combat.getGroupEnemies(targetGroup, isEnemy) == 1)
+      var targetStr = ' group ' + String.fromCharCode(65 + targetID);
+      if (combat.getGroupEnemies(targetID, isEnemy) == 1)
         {
-          var targetOp = combat.getFirstGroupOpponent(targetGroup);
+          var targetOp = combat.getFirstGroupOpponent(targetID);
           targetStr = targetOp.name;
         }
       log(segment, nameCapped + ' ' +
@@ -283,6 +297,7 @@ class CombatOpponent
       target.wasAttacked = true;
 /*
       // target will get a pre-counterattack if weapon length allows
+      // TODO check for ranged too
       if (isCharge && 
           (target.type == COMBAT_NPC ||
            target.type == COMBAT_PARTY_MEMBER) &&
@@ -375,7 +390,7 @@ class CombatOpponent
             {
               log(segment, nameCapped + ' ' +
                 (isPlayer ? 'try' : 'tries') + ' to ' +
-                character.meleeWeapon.attackName + ' ' +
+                character.weapon.weapon.attackMelee + ' ' +
                 target.name + ', but miss' +
                 (isPlayer ? '' : 'es') + '.' +
                 (game.extendedInfo ? ext : ''));
@@ -383,7 +398,7 @@ class CombatOpponent
             }
           // TODO vs large
           // NOTE: copy array to apply bonuses
-          var row = Reflect.copy(character.meleeWeapon.damageVsMedium);
+          var row = Reflect.copy(character.weapon.weapon.damageVsMedium);
           row[2] += character.strStats.toDamageBonus;
           var dmg = Const.dice(row[0], row[1]) + row[2];
           if (dmg < 0)
@@ -395,8 +410,8 @@ class CombatOpponent
 
           log(segment, nameCapped + ' ' +
             (isPlayer ?
-             character.meleeWeapon.attackName :
-             character.meleeWeapon.attackName2) + ' ' +
+             character.weapon.weapon.attackMelee :
+             character.weapon.weapon.attackMelee2) + ' ' +
             target.name + ' for ' + dmg + ' damage.' +
             (game.extendedInfo ? ext : ''));
           target.hp -= dmg;

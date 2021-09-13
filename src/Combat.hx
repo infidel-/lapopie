@@ -182,6 +182,12 @@ class Combat
               game.console.print('There are no enemies close to you.');
               return -1;
             }
+          if (player.character.weapon.weapon.type != WEAPONTYPE_MELEE &&
+              player.character.weapon.weapon.type != WEAPONTYPE_BOTH)
+            {
+              game.console.print('You don\'t have a melee weapon drawn.');
+              return -1;
+            }
           player.declaredAction = ACTION_ATTACK;
         }
 
@@ -194,13 +200,7 @@ class Combat
               return -1;
             }
 
-          var group = tokens[0].charCodeAt(0);
-          // A-Z
-          if (group >= 65 && group <= 90)
-            group -= 65;
-          // a-z
-          else if (group >= 97 && group <= 122)
-            group -= 97;
+          var group = Const.letterToNum(tokens[0]);
           if (player.group == group)
             {
               game.console.print('You are in that group.');
@@ -227,8 +227,35 @@ class Combat
                 (10 - round + player.lastChargeRound) + ' more rounds before charging.');
               return -1;
             }
+          if (player.character.weapon.weapon.type != WEAPONTYPE_MELEE &&
+              player.character.weapon.weapon.type != WEAPONTYPE_BOTH)
+            {
+              game.console.print('You cannot charge without a melee weapon drawn.');
+              return -1;
+            }
           player.declaredAction = ACTION_CHARGE;
-          player.targetGroup = group;
+          player.targetID = group;
+        }
+
+      // draw
+      else if (cmd == 'draw')
+        {
+          if (tokens.length == 0 || tokens[0].length > 1)
+            {
+              player.character.inventory.print(ITEM_WEAPON);
+              game.console.print('Usage: draw &lt;item letter&gt;');
+              return -1;
+            }
+
+          var itemIndex = Const.letterToNum(tokens[0]);
+          var item = player.character.inventory.get(ITEM_WEAPON, itemIndex);
+          if (item == null)
+            {
+              game.console.print('There is no such item in your inventory.');
+              return -1;
+            }
+          player.declaredAction = ACTION_DRAW;
+          player.targetID = item.id;
         }
 
       // retreat
@@ -236,7 +263,7 @@ class Combat
         {
           if (getGroupEnemies(player.group, player.isEnemy) == 0)
             {
-              game.console.print('You are not actively fighting.');
+              game.console.print('You are not in a melee.');
               return -1;
             }
           player.isParrying = true;
@@ -246,7 +273,7 @@ class Combat
       // parry
       else if (cmd == 'parry')
         {
-          if (player.character.meleeWeapon.id == 'unarmed')
+          if (player.character.weapon.weapon.id == 'unarmed')
             {
               game.console.print('You cannot parry without a melee weapon.');
               return -1;
@@ -282,7 +309,7 @@ class Combat
               return -1;
             }
           player.declaredAction = ACTION_MOVE;
-          player.targetGroup = group;
+          player.targetID = group;
         }
       else return 0;
 

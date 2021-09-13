@@ -30,10 +30,10 @@ class Game
       party = [];
 
       // ============== DEMO SETUP ================
-      // party
+      // player
       player = new Character(this, CLASS_CLERIC, {
         str: 6 + Const.dice(2,6),
-        str18: 0,
+        str18: -1,
         dex: 6 + Const.dice(2,6),
         con: 6 + Const.dice(2,6),
         int: 6 + Const.dice(2,6),
@@ -43,9 +43,13 @@ class Game
       player.name = 'you';
       player.nameCapped = 'You';
       player.isPlayer = true;
-      player.giveAndWearArmor('chain');
-      player.giveAndWearMeleeWeapon('staff');
+      player.giveItem(ITEM_ARMOR, 'chain', true);
+      player.giveItem(ITEM_WEAPON, 'staff', false);
+      player.giveItem(ITEM_WEAPON, 'sling', true);
+
       party.push(player);
+
+      // jean
       var jean = new Character(this, CLASS_FIGHTER, {
         str: 6 + Const.dice(2,6),
         str18: 0,
@@ -57,8 +61,8 @@ class Game
       });
       jean.name = 'Jean';
       jean.nameCapped = 'Jean';
-      jean.giveAndWearArmor('studded');
-      jean.giveAndWearMeleeWeapon('club');
+      jean.giveItem(ITEM_ARMOR, 'studded', true);
+      jean.giveItem(ITEM_WEAPON, 'club', true);
       party.push(jean);
       console = new Console(this);
 
@@ -91,6 +95,12 @@ class Game
       console.print('### GAME OVER');
     }
 
+// print todo string
+  public function todo(s: String)
+    {
+      console.print('<span class=todo>TODO ' + s + '</span>');
+    }
+
 
 // get state
   function get_state()
@@ -105,7 +115,6 @@ class Game
       console.debug('Game state: ' + _state);
       return st;
     }
-
 
   static var inst: Game;
   static function main()

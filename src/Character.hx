@@ -15,15 +15,21 @@ class Character
   public var ac: Int;
   public var move: Int;
 
-  // equipment
-  public var armor: _Armor;
-  public var meleeWeapon: _MeleeWeapon;
+  // inventory and equipment 
+  public var inventory: Inventory;
+  public var armor: Item;
+  public var weapon: Item;
+
+  // fake items for equipment
+  var unarmedItem: Item;
+  var noArmorItem: Item;
 
   public function new(g: Game, c: _CharacterClass, s: Stats)
     {
       game = g;
       stats = s;
       className = c;
+      inventory = new Inventory(game, this);
       if (c == CLASS_FIGHTER)
         classTables = _TablesFighter.instance;
       else if (c == CLASS_CLERIC)
@@ -38,32 +44,63 @@ class Character
         classTables.conStats[stats.con].hpBonus;
       xp = 0;
       level = 1;
-      armor = _ItemsTables.armor['none'];
-      meleeWeapon = _ItemsTables.meleeWeapons['unarmed'];
+      unarmedItem = new Item();
+      unarmedItem.type == ITEM_WEAPON;
+      unarmedItem.weapon = _ItemsTables.weapons['unarmed'];
+      weapon = unarmedItem;
+      noArmorItem = new Item();
+      noArmorItem.type == ITEM_ARMOR;
+      noArmorItem.armor = _ItemsTables.armor['none'];
+      armor = noArmorItem;
       ac = 0;
       move = 90;
       recalc();
     }
 
-// give and wear melee weapon
-  public function giveAndWearMeleeWeapon(key: String)
+// give item by type/string id and wear it if necessary
+  public function giveItem(t: _ItemType, key: String, wear: Bool)
     {
-      var tmp = _ItemsTables.meleeWeapons[key];
-      if (tmp == null)
-        throw 'no such melee weapon: ' + key;
-      meleeWeapon = tmp;
+      if (t == ITEM_WEAPON)
+        {
+          var tmp = _ItemsTables.weapons[key];
+          if (tmp == null)
+            throw 'no such weapon: ' + key;
 
+          var item = new Item();
+          item.id = inventory.getEmptyID();
+          item.type = t;
+          item.weapon = tmp;
+          inventory.add(item);
+          if (wear)
+            draw(item);
+        }
+      else if (t == ITEM_ARMOR)
+        {
+          var tmp = _ItemsTables.armor[key];
+          if (tmp == null)
+            throw 'no such armor: ' + key;
+
+          var item = new Item();
+          item.id = inventory.getEmptyID();
+          item.type = t;
+          item.armor = tmp;
+          if (wear)
+            armor = item;
+          else inventory.add(item);
+        }
       recalc();
     }
 
-// give and wear armor
-  public function giveAndWearArmor(key: String)
+// draw weapon
+  public function draw(item: Item)
     {
-      var tmp = _ItemsTables.armor[key];
-      if (tmp == null)
-        throw 'no such armor: ' + key;
-      armor = tmp;
-
+      if (weapon.weapon.id != 'unarmed')
+        {
+          weapon.id = inventory.getEmptyID();
+          inventory.list.add(weapon);
+        }
+      inventory.list.remove(item);
+      weapon = item;
       recalc();
     }
 
@@ -79,7 +116,7 @@ class Character
             break;
           }
       strStats = _TablesClass.instance.strStats[strkey];
-      ac = 10 + armor.ac +
+      ac = 10 + armor.armor.ac +
         _TablesClass.instance.dexStats[stats.dex].acAdj;
     }
 
@@ -99,14 +136,17 @@ class Character
         'AC ' + ac + ', ' +
         'XP ' + xp + ', ' +
         'LVL ' + level + '\n');
-      var dmgBonus = meleeWeapon.damageVsMedium[2] +
+      var wpn = weapon.weapon;
+      var dmgBonus = wpn.damageVsMedium[2];
+      if (wpn.type == WEAPONTYPE_MELEE || wpn.type == WEAPONTYPE_BOTH)
         strStats.toDamageBonus;
-      sb.add('&nbsp;&nbsp;' + meleeWeapon.name +
-        ' (' + meleeWeapon.damageVsMedium[0] + 'd' +
-        meleeWeapon.damageVsMedium[1] +
+      sb.add('&nbsp;&nbsp;' + wpn.name +
+        ' (' + wpn.damageVsMedium[0] + 'd' +
+        wpn.damageVsMedium[1] +
         (dmgBonus < 0 ? '' + dmgBonus : '') +
         (dmgBonus > 0 ? '+' + dmgBonus : '') + ')\n');
-      sb.add('&nbsp;&nbsp;' + armor.name + ' (AC ' + (10 + armor.ac) + ')');
+      sb.add('&nbsp;&nbsp;' + armor.armor.name + ' (AC ' +
+        (10 + armor.armor.ac) + ')');
       var s = sb.toString();
 //      s = s.substr(0, s.length - 2);
       s += '</span>';
