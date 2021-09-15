@@ -6,5 +6,6 @@ abstract _CombatAction(String) {
   var ACTION_MOVE = 'ACTION_MOVE';
   var ACTION_PARRY = 'ACTION_PARRY';
   var ACTION_RETREAT = 'ACTION_RETREAT';
+  var ACTION_SHOOT = 'ACTION_SHOOT';
   var ACTION_WAIT = 'ACTION_WAIT';
 }

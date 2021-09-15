@@ -3,6 +3,7 @@ class Character
   var game: Game;
   public var stats: Stats;
   public var strStats: _StrStats;
+  public var dexStats(get,never): _DexStats;
   public var name: String;
   public var nameCapped: String;
   public var className: _CharacterClass;
@@ -144,7 +145,10 @@ class Character
         ' (' + wpn.damageVsMedium[0] + 'd' +
         wpn.damageVsMedium[1] +
         (dmgBonus < 0 ? '' + dmgBonus : '') +
-        (dmgBonus > 0 ? '+' + dmgBonus : '') + ')\n');
+        (dmgBonus > 0 ? '+' + dmgBonus : '') + ')');
+      if (wpn.type == WEAPONTYPE_RANGED) // || wpn.type == WEAPONTYPE_BOTH)
+        sb.add(', range ' + wpn.range + "'");
+      sb.add('\n');
       sb.add('&nbsp;&nbsp;' + armor.armor.name + ' (AC ' +
         (10 + armor.armor.ac) + ')');
       var s = sb.toString();
@@ -152,4 +156,6 @@ class Character
       s += '</span>';
       return s;
     }
+
+  function get_dexStats() return _TablesClass.instance.dexStats[stats.dex];
 }

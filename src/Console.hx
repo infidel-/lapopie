@@ -85,6 +85,9 @@ class Console
     }
 
 // common commands
+// 0 - error, show standard error message
+// 1 - success
+// -1 - error, skip standard error message
   function runCommandCommon(cmd: String, tokens: Array<String>): Int
     {
       // help
@@ -199,6 +202,9 @@ class Console
 
 
 // location commands
+// 0 - error, show standard error message
+// 1 - success
+// -1 - error, skip standard error message
   function runCommandLocation(cmd: String, tokens: Array<String>): Int
     {
       // check for special location commands
@@ -258,38 +264,29 @@ class Console
 
 #if mydebug
 // debug command
+// 0 - error, show standard error message
+// 1 - success
+// -1 - error, skip standard error message
   function runDebugCommand(tokens: Array<String>): Int
     {
-/*
       if (tokens.length == 0)
         {
           system('Debug commands:\n' +
-            'anxiety (a) - set anxiety in chat\n' +
-            'eval (e) - toggle always on evaluate timer\n' +
-            'hp [val] - set player hp\n' +
-            'fail (f) - fail next roll\n' +
-            'rapport (r) - set rapport in chat\n' +
-            'skill (sk) [id/name] [val] - set skill value'
+            'init - player side always wins combat initiative'
           );
           return 1;
         }
       var cmd = tokens[0];
 
       // set chat anxiety
-      if (cmd == 'anxiety' || cmd == 'a')
+      if (cmd == 'init')
         {
-          if (game.state != STATE_CHAT)
-            {
-              system('Not in chat.');
-              return 1;
-            }
-          var val = Std.parseInt(tokens[1]);
-          system('[Anxiety ' + val + ']');
-          game.npc.anxiety = val;
-
-          return 1;
+          game.debug.initiative = !game.debug.initiative;
+          system('[Player initiative victory: ' + game.debug.initiative + ']');
+          return -1;
         }
 
+/*
       // evaluate timer
       else if (cmd == 'eval' || cmd == 'e')
         {

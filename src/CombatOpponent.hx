@@ -136,7 +136,10 @@ class CombatOpponent
       else if (declaredAction == ACTION_CHARGE)
         {
           if (actionMove(segment, true))
-            actionAttack(segment, true);
+            actionAttack(segment, {
+              isCharge: true,
+              isRanged: false,
+            });
         }
       else if (declaredAction == ACTION_DRAW)
         {
@@ -159,7 +162,10 @@ class CombatOpponent
             (isPlayer ? '' : 's') + '.');
         }
       else if (declaredAction == ACTION_ATTACK)
-        actionAttack(segment, false);
+        actionAttack(segment, {
+          isCharge: false,
+          isRanged: false,
+        });
 
       else if (declaredAction == ACTION_PARRY)
         {
@@ -172,6 +178,12 @@ class CombatOpponent
 
       else if (declaredAction == ACTION_RETREAT)
         actionRetreat(segment);
+
+      else if (declaredAction == ACTION_SHOOT)
+        actionAttack(segment, {
+          isCharge: false,
+          isRanged: true,
+        });
 
       declaredAction = ACTION_WAIT;
     }
@@ -269,16 +281,44 @@ class CombatOpponent
       return true;
     }
 
-// attack random opponent in the same group
+// attack random opponent in the target group
 // can be called after charge
-  function actionAttack(segment: Int, isCharge: Bool)
+  function actionAttack(segment: Int, opts: {
+      isCharge: Bool,
+      isRanged: Bool,
+    })
     {
-      // get a list of live opponents in the same group
+      var isRanged = opts.isRanged;
+      var isCharge = opts.isCharge;
+
+      // ranged attack - cannot be in the melee
+      if (isRanged && combat.getGroupEnemies(group, isEnemy) > 0)
+        {
+          log(segment, nameCapped +
+            (isPlayer ? ' are blocked' : ' is blocked') +
+            ' from using a ranged weapon by engaging in melee.');
+          return;
+        }
+
+      // get a list of targets
       var targets = [];
       for (op in combat.opponents)
         {
-          if (op.group != group || op.isEnemy == isEnemy || op.isDead)
+          if (op.isDead)
             continue;
+
+          // ranged - everyone in the target group
+          if (opts.isRanged)
+            {
+              if (op.group != targetID)
+                continue;
+            }
+          // melee - enemies only
+          else
+            {
+              if (op.group != group || op.isEnemy == isEnemy)
+                continue;
+            }
           targets.push(op);
         }
       // all opponents are dead already
@@ -312,7 +352,7 @@ class CombatOpponent
       var parryBonus = 0;
       if ((target.type == COMBAT_NPC ||
           target.type == COMBAT_PARTY_MEMBER) &&
-          target.isParrying)
+          target.isParrying && !isRanged)
         {
           parryBonus = - 2 - target.character.strStats.toHitBonus;
           if (parryBonus > 0)
@@ -320,6 +360,7 @@ class CombatOpponent
         }
       if (type == COMBAT_MONSTER)
         {
+          // TODO monster ranged attacks
           var thac = _TablesFighter.instance.thac(monster.level,
             targetAC);
           for (atk in 0...monster.attacks)
@@ -366,52 +407,69 @@ class CombatOpponent
       // character
       else if (type == COMBAT_PARTY_MEMBER || type == COMBAT_NPC)
         {
+          // == to hit roll
+          var wpn = character.weapon.weapon;
           var thac = character.classTables.thac(character.level,
             targetAC);
-          var roll = Const.dice(1, 20) +
-            character.strStats.toHitBonus +
-            (isCharge ? 2 : 0);
-          var ext = ' [rolls ' + roll + ' vs ' + thac + ' (AC ' +
-            targetAC + ')';
-          if (character.strStats.toHitBonus != 0)
+          var toHitBonus = (isRanged ?
+            character.dexStats.missileBonusToHit :
+            character.strStats.toHitBonus);
+          var rangeBonus = 0;
+          if (isRanged)
             {
-              if (character.strStats.toHitBonus > 0)
-                ext += ', +' + character.strStats.toHitBonus;
-              else ext += ', ' + character.strStats.toHitBonus;
-              ext += ' from STR';
+              var distance = distanceToOpponent(target);
+              var mod = Math.floor(1.0 * distance / wpn.range);
+              rangeBonus = -2 * mod;
             }
+          var roll = Const.dice(1, 20) + toHitBonus + (isCharge ? 2 : 0) +
+            rangeBonus;
+
+          // == to hit log
+          var ext = ' <span class=extInfo>[rolls ' + roll + ' vs ' + thac + ' (AC ' +
+            targetAC + ')';
+          if (toHitBonus != 0)
+            {
+              if (toHitBonus > 0)
+                ext += ', +' + toHitBonus;
+              else ext += ', ' + toHitBonus;
+              ext += ' from ' + (isRanged ? 'DEX' : 'STR');
+            }
+          if (isRanged && rangeBonus != 0)
+            ext += ', ' + rangeBonus + ' from range';
           if (isCharge)
             ext += ', +2 from charge';
           if (target.isParrying)
             ext += ', ' + parryBonus + ' from parry';
-          ext += ']';
-
+          ext += ']</span>';
           if (roll < thac)
             {
               log(segment, nameCapped + ' ' +
                 (isPlayer ? 'try' : 'tries') + ' to ' +
-                character.weapon.weapon.attackMelee + ' ' +
+                (isRanged ? wpn.attackRanged : wpn.attackMelee) + ' ' +
                 target.name + ', but miss' +
                 (isPlayer ? '' : 'es') + '.' +
                 (game.extendedInfo ? ext : ''));
               return;
             }
+
+          // == damage
           // TODO vs large
           // NOTE: copy array to apply bonuses
-          var row = Reflect.copy(character.weapon.weapon.damageVsMedium);
+          var attackStr = null;
+          if (isRanged)
+            attackStr = (isPlayer ? wpn.attackRanged : wpn.attackRanged2);
+          else attackStr =
+            (isPlayer ? wpn.attackMelee : wpn.attackMelee2);
+          var row = Reflect.copy(wpn.damageVsMedium);
           row[2] += character.strStats.toDamageBonus;
           var dmg = Const.dice(row[0], row[1]) + row[2];
           if (dmg < 0)
             dmg = 0;
-          ext += ' [DMG ' + row[0] + 'd' + row[1] +
+          ext += ' <span class=extInfo>[DMG ' + row[0] + 'd' + row[1] +
             (row[2] > 0 ? '+' + row[2] : '') + 
             (row[2] < 0 ? '' + row[2] : '') +
-            ' = ' + dmg + ']';
-
-          log(segment, nameCapped + ' ' +
-            (isPlayer ?
-             character.weapon.weapon.attackMelee :
-             character.weapon.weapon.attackMelee2) + ' ' +
+            ' = ' + dmg + ']</span>';
+          log(segment, nameCapped + ' ' + attackStr + ' ' +
             target.name + ' for ' + dmg + ' damage.' +
             (game.extendedInfo ? ext : ''));
           target.hp -= dmg;

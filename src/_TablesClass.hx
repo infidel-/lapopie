@@ -161,7 +161,7 @@ class _TablesClass
   ];
 
   // DEXTERITY
-  public var dexStats = [
+  public var dexStats: Map<Int, _DexStats> = [
     3 => {
       surpriseBonus: -3,
       missileBonusToHit: -3,

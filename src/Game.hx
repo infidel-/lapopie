@@ -9,8 +9,7 @@ class Game
   public var party: Array<Character>;
   public var extendedInfo: Bool;
   public var debug: {
-    var evaluate: Bool;
-    var failRoll: Bool;
+    var initiative: Bool;
   }
   public var state(get, set): _GameState;
   var _state: _GameState;
@@ -24,8 +23,7 @@ class Game
       extendedInfo = true;
       combat = new Combat(this);
       debug = {
-        evaluate: false,
-        failRoll: false,
+        initiative: false,
       };
       party = [];
 
@@ -74,6 +72,7 @@ class Game
       scene.enter();
 
       // DEBUG: auto commands
+//      console.runCommand('dbg init');
       for (i in 0...4)
         console.runCommand('z');
 //      scene.moveTo('reflection');

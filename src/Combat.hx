@@ -216,6 +216,11 @@ class Combat
               game.console.print('That group has no opponents.');
               return -1;
             }
+          if (getGroupEnemies(player.group, player.isEnemy) > 0)
+            {
+              game.console.print('You are engaged in melee.');
+              return -1;
+            }
           if (player.distanceToGroup(group) > player.character.move * 2)
             {
               game.console.print('That group is too far away.');
@@ -311,6 +316,52 @@ class Combat
           player.declaredAction = ACTION_MOVE;
           player.targetID = group;
         }
+
+      // shoot
+      else if (cmd == 'shoot')
+        {
+          if (tokens.length == 0 || tokens[0].length > 1)
+            {
+              game.console.print('Usage: shoot &lt;group letter&gt;');
+              return -1;
+            }
+
+          var group = Const.letterToNum(tokens[0]);
+          if (player.group == group)
+            {
+              game.console.print('You are in that group.');
+              return -1;
+            }
+          if (getGroupMembers(group) == 0)
+            {
+              game.console.print('No such combat group.');
+              return -1;
+            }
+          if (getGroupEnemies(group, player.isEnemy) == 0)
+            {
+              game.console.print('That group has no opponents.');
+              return -1;
+            }
+          if (getGroupEnemies(player.group, player.isEnemy) > 0)
+            {
+              game.console.print('You are engaged in melee.');
+              return -1;
+            }
+          if (player.character.weapon.weapon.type != WEAPONTYPE_RANGED &&
+              player.character.weapon.weapon.type != WEAPONTYPE_BOTH)
+            {
+              game.console.print('You cannot shoot without a ranged weapon drawn.');
+              return -1;
+            }
+          if (player.distanceToGroup(group) > player.character.weapon.weapon.range * 4)
+            {
+              game.console.print('That group is too far away.');
+              return -1;
+            }
+          player.declaredAction = ACTION_SHOOT;
+          player.targetID = group;
+        }
+
       else return 0;
 
       // combat time passing
@@ -334,6 +385,11 @@ class Combat
       var enemyRoll = Const.dice(1, 6);
       while (enemyRoll == playerRoll)
         enemyRoll = Const.dice(1, 6);
+      if (game.debug.initiative)
+        {
+          playerRoll = 1;
+          enemyRoll = 6;
+        }
       game.console.print('Roll initiative (1d6): player side ' +
         playerRoll + ', enemy side ' + enemyRoll);
 

@@ -66,6 +66,14 @@ p {
   color: #a65cff;
 }
 
+.extInfo {
+  font-family: monospace,monospace;
+  font-size: 90%;
+  letter-spacing: 0.01em;
+  color: #aaa;
+  line-height: .5;
+}
+
 .consoleDebug {
   font-family: monospace,monospace;
   font-size: 70%;

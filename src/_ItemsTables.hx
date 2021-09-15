@@ -522,8 +522,8 @@ class _ItemsTables
       id: 'sling',
       name: 'Sling',
       type: WEAPONTYPE_RANGED,
-      attackRanged: 'shoot a stone at ',
-      attackRanged2: 'shoots a stone at ',
+      attackRanged: 'sling a stone at ',
+      attackRanged2: 'slings a stone at ',
       damageVsMedium: [ 1, 4, 0 ], // XdY+Z
       damageVsLarge: [ 1, 4, 0 ], // XdY+Z
       range: 35,
