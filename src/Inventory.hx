@@ -31,13 +31,13 @@ class Inventory
     }
 
 // print all items of a given type
-  public function print(type: _ItemType)
+  public function print(?type: _ItemType = null)
     {
       var s = '';
       var idx = 0;
       for (item in list)
         {
-          if (item.type != type)
+          if (type != null && item.type != type)
             continue;
           s += String.fromCharCode(97 + idx) + ') ' +
             item.getName();

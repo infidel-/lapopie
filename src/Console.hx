@@ -43,7 +43,8 @@ class Console
       var ret = runCommandCommon(cmd, tokens);
       if (ret != 0)
         {
-          runCommandPost();
+          if (ret > 0)
+            runCommandPost();
           return ret;
         }
       if (game.isOver)
@@ -75,6 +76,9 @@ class Console
     }
 
 // post-run command, move world
+// 0 - error, show standard error message
+// 1 - success
+// -1 - error, skip standard error message
   function runCommandPost()
     {
       game.turn();
@@ -89,7 +93,7 @@ class Console
           if (tokens.length == 0)
             {
               var s = 'Commonly available commands: ' +
-                'again (g), party/stats, who\n';
+                'again (g), inventory (inv, i), party/stats, who\n';
               if (game.state == STATE_LOCATION)
                 s += 'Location commands: ' +
                   'enter, examine (x), exit, go, ' +
@@ -133,6 +137,13 @@ class Console
       else if (cmd == 'debug' || cmd == 'dbg')
         return runDebugCommand(tokens);
 #end
+
+      // inventory
+      else if (cmd == 'inventory' || cmd == 'inv' || cmd == 'i')
+        {
+          game.player.inventory.print(null);
+          return -1;
+        }
 
       // party/stats
       else if (cmd == 'party' || cmd == 'stats')
