@@ -385,6 +385,7 @@ class Combat
       var enemyRoll = Const.dice(1, 6);
       while (enemyRoll == playerRoll)
         enemyRoll = Const.dice(1, 6);
+      // DEBUG: always win initiative
       if (game.debug.initiative)
         {
           playerRoll = 1;
@@ -393,23 +394,39 @@ class Combat
       game.console.print('Roll initiative (1d6): player side ' +
         playerRoll + ', enemy side ' + enemyRoll);
 
+      // set order according to initiative with dex mods
+      var order = new Map<Int, Array<CombatOpponent>>();
+      for (op in opponents)
+        if (!op.isDead)
+          {
+            var segment = (op.isEnemy ? enemyRoll : playerRoll);
+            // missile attacks get dex bonuses
+            if (op.declaredAction == ACTION_SHOOT &&
+                (op.type == COMBAT_PARTY_MEMBER ||
+                 op.type == COMBAT_NPC))
+              segment -= op.character.dexStats.missileBonusToHit;
+            if (segment < 1)
+              segment = 1;
+            var list = order[segment];
+            if (list == null)
+              {
+                list = [];
+                order[segment] = list;
+              }
+            list.push(op);
+          }
+
       // resolution
       logRound = '';
       logSegment = 0;
       for (segment in 1...11)
         {
-          if (segment == playerRoll)
-            {
-              for (op in opponents)
-                if (!op.isEnemy && !op.isDead)
-                  op.resolveAction(segment);
-            }
-          else if (segment == enemyRoll)
-            {
-              for (op in opponents)
-                if (op.isEnemy && !op.isDead)
-                  op.resolveAction(segment);
-            }
+          var list = order[segment];
+          if (list == null)
+            continue;
+          for (op in list)
+            if (!op.isDead)
+              op.resolveAction(segment);
         }
       game.console.print(logRound);
       round++;

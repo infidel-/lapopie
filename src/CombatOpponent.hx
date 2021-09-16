@@ -180,10 +180,19 @@ class CombatOpponent
         actionRetreat(segment);
 
       else if (declaredAction == ACTION_SHOOT)
-        actionAttack(segment, {
-          isCharge: false,
-          isRanged: true,
-        });
+        {
+          var numAttacks = 1;
+          if (type == COMBAT_PARTY_MEMBER ||
+              type == COMBAT_NPC)
+            numAttacks = character.weapon.weapon.shots;
+          if (numAttacks < 1)
+            numAttacks = 1;
+          for (i in 0...numAttacks)
+            actionAttack(segment, {
+              isCharge: false,
+              isRanged: true,
+            });
+        }
 
       declaredAction = ACTION_WAIT;
     }

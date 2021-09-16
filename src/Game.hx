@@ -44,6 +44,7 @@ class Game
       player.giveItem(ITEM_ARMOR, 'chain', true);
       player.giveItem(ITEM_WEAPON, 'staff', false);
       player.giveItem(ITEM_WEAPON, 'sling', true);
+      //player.giveItem(ITEM_WEAPON, 'shortBow', true);
 
       party.push(player);
 
