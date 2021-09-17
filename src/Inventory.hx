@@ -40,7 +40,7 @@ class Inventory
           if (type != null && item.type != type)
             continue;
           s += String.fromCharCode(97 + idx) + ') ' +
-            item.getName();
+            item.getName() + '\n';
           idx++;
         }
       game.console.print(s);

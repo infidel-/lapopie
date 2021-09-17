@@ -5,4 +5,6 @@ typedef _Armor = {
   var moveRate: Int;
   var ac: Int;
   var cost: Int;
+  @:optional var isShield: Bool;
+  @:optional var maxAttacksBlocked: Int;
 }

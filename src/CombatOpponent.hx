@@ -13,7 +13,7 @@ class CombatOpponent
   public var isEnemy: Bool;
   public var isDead: Bool;
   public var isParrying: Bool;
-  public var wasAttacked: Bool;
+  public var wasAttacked: Int;
   public var declaredAction: _CombatAction;
   public var targetID: Int; // group id, inventory item id
   public var lastChargeRound: Int;
@@ -43,13 +43,13 @@ class CombatOpponent
       isParrying = false;
       isEnemy = false;
       isDead = false;
-      wasAttacked = false;
+      wasAttacked = 0;
     }
 
 // clear state
   public function clear()
     {
-      wasAttacked = false;
+      wasAttacked = 0;
       isParrying = false;
     }
 
@@ -144,17 +144,25 @@ class CombatOpponent
       else if (declaredAction == ACTION_DRAW)
         {
           var item = character.inventory.getByID(targetID);
-          if (character.weapon.weapon.id != 'unarmed')
+          var oldWeapon = character.weapon.getNameLower();
+          var oldWeaponID = character.weapon.getID();
+          var oldShield = character.shield.getNameLower();
+          var oldShieldID = character.shield.getID();
+          character.draw(item);
+          if (oldWeaponID != 'unarmed')
             log(segment, nameCapped + ' sheathe' +
               (isPlayer ? ' your ' : 's their ') +
-              character.weapon.getNameLower() +
-              ' and draw' +
+              oldWeapon +
+              (oldShieldID != 'none' ? ' and ' + oldShield : '') +
+              ', then draw' +
               (isPlayer ? '' : 's') + ' the ' +
-              item.getNameLower() + '.');
+              item.getNameLower() +
+              (character.shield.getID() != 'none' ?
+               ' and ' + character.shield.getNameLower() : '') +
+              '.');
           else log(segment, nameCapped + ' draw' +
             (isPlayer ? '' : 's') + ' a ' +
             item.getNameLower() + '.');
-          character.draw(item);
         }
       else if (declaredAction == ACTION_WAIT)
         {
@@ -169,7 +177,7 @@ class CombatOpponent
 
       else if (declaredAction == ACTION_PARRY)
         {
-          if (wasAttacked)
+          if (wasAttacked > 0)
             log(segment, nameCapped + ' ' +
               (isPlayer ? 'try' : 'tries') + ' to parry incoming enemy attacks.');
           else log(segment, nameCapped + ' stand' +
@@ -343,7 +351,7 @@ class CombatOpponent
 
       // pick random target and attack
       var target = targets[Std.random(targets.length)];
-      target.wasAttacked = true;
+      target.wasAttacked++;
 /*
       // target will get a pre-counterattack if weapon length allows
       // TODO check for ranged too
@@ -357,7 +365,19 @@ class CombatOpponent
           isDead
         }
 */
+      // calculate AC
       var targetAC = target.getAC();
+      var shieldAC = 0;
+      if ((target.type == COMBAT_NPC ||
+          target.type == COMBAT_PARTY_MEMBER) &&
+          target.character.shield.armor.maxAttacksBlocked >=
+          target.wasAttacked)
+        {
+          shieldAC = target.character.shield.armor.ac;
+          targetAC += shieldAC;
+        }
+
+      // calculate parry bonus
       var parryBonus = 0;
       if ((target.type == COMBAT_NPC ||
           target.type == COMBAT_PARTY_MEMBER) &&
@@ -367,6 +387,8 @@ class CombatOpponent
           if (parryBonus > 0)
             parryBonus = 0;
         }
+
+      // monster attack
       if (type == COMBAT_MONSTER)
         {
           // TODO monster ranged attacks
@@ -374,15 +396,17 @@ class CombatOpponent
             targetAC);
           for (atk in 0...monster.attacks)
             {
+              // == to hit roll and log
               var atkName = monster.attackNames[atk];
               var roll = Const.dice(1, 20) +
                 (isCharge ? 2 : 0) +
                 parryBonus;
-              var ext = ' [rolls ' + roll + ' vs ' + thac + ' (AC ' +
+              var ext = ' <span class=extInfo>[rolls ' + roll + ' vs ' + thac + ' (AC ' +
                 targetAC + ')' +
                 (isCharge ? ', +2 from charge' : '') +
                 (target.isParrying ? ', ' + parryBonus + ' from parry' : '') +
-                ']';
+                (shieldAC != 0 ? ', ' + shieldAC + ' AC from shield' : '') +
+                ']</span>';
               if (roll < thac)
                 {
                   log(segment, nameCapped + ' ' +
@@ -392,14 +416,15 @@ class CombatOpponent
                     (game.extendedInfo ? ext : ''));
                   continue;
                 }
+
+              // == damage
               var row = monster.damage[atk];
               var dmg = Const.dice(row[0], row[1]) + row[2];
               if (dmg < 0)
                 dmg = 0;
-              ext += ' [DMG ' + row[0] + 'd' + row[1] +
+              ext += ' <span class=extInfo>[DMG ' + row[0] + 'd' + row[1] +
                 (row[2] > 0 ? '+' + row[2] : '') + 
-                (row[2] < 0 ? '' + row[2] : '') + ' = ' + dmg + ']';
-
+                (row[2] < 0 ? '' + row[2] : '') + ' = ' + dmg + ']</span>';
               log(segment, nameCapped + ' ' + atkName +
                 (isPlayer ? '' : 's') + ' ' +
                 target.name + ' for ' + dmg + ' damage.' +
@@ -434,8 +459,8 @@ class CombatOpponent
             rangeBonus;
 
           // == to hit log
-          var ext = ' <span class=extInfo>[rolls ' + roll + ' vs ' + thac + ' (AC ' +
-            targetAC + ')';
+          var ext = ' <span class=extInfo>[rolls ' + roll + ' vs ' +
+            thac + ' (AC ' + targetAC + ')';
           if (toHitBonus != 0)
             {
               if (toHitBonus > 0)

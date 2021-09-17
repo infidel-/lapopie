@@ -85,6 +85,8 @@ class _ItemsTables
     'shieldSmall' => {
       id: 'shieldSmall',
       name: 'Small shield',
+      isShield: true,
+      maxAttacksBlocked: 1,
       weight: 5,
       moveRate: 0,
       ac: -1,
@@ -93,6 +95,8 @@ class _ItemsTables
     'shieldMedium' => {
       id: 'shieldMedium',
       name: 'Medium shield',
+      isShield: true,
+      maxAttacksBlocked: 2,
       weight: 8,
       moveRate: 0,
       ac: -1,
@@ -101,6 +105,8 @@ class _ItemsTables
     'shieldLarge' => {
       id: 'shieldLarge',
       name: 'Large shield',
+      isShield: true,
+      maxAttacksBlocked: 3,
       weight: 10,
       moveRate: 0,
       ac: -1,
@@ -115,6 +121,7 @@ class _ItemsTables
       id: 'unarmed',
       name: 'Unarmed',
       type: WEAPONTYPE_MELEE,
+      canShield: true,
       attackMelee: 'punch',
       attackMelee2: 'punches',
       damageVsMedium: [ 1, 2, 0 ], // XdY+Z
@@ -127,6 +134,7 @@ class _ItemsTables
       id: 'battleAxe',
       name: 'Battle axe',
       type: WEAPONTYPE_MELEE,
+      canShield: true,
       attackMelee: 'hack',
       attackMelee2: 'hacks',
       damageVsMedium: [ 1, 8, 0 ], // XdY+Z
@@ -139,6 +147,7 @@ class _ItemsTables
       id: 'handAxe',
       name: 'Hand axe',
       type: WEAPONTYPE_BOTH,
+      canShield: true,
       attackMelee: 'hack',
       attackMelee2: 'hacks',
       attackRanged: 'throw an axe at ',
@@ -154,6 +163,7 @@ class _ItemsTables
       id: 'club',
       name: 'Club',
       type: WEAPONTYPE_BOTH,
+      canShield: true,
       attackMelee: 'club',
       attackMelee2: 'clubs',
       attackRanged: 'throw a club at ',
@@ -169,6 +179,7 @@ class _ItemsTables
       id: 'dagger',
       name: 'Dagger',
       type: WEAPONTYPE_BOTH,
+      canShield: true,
       attackMelee: 'stab',
       attackMelee2: 'stabs',
       attackRanged: 'throw a dagger at ',
@@ -185,6 +196,7 @@ class _ItemsTables
       id: 'dart',
       name: 'Dart',
       type: WEAPONTYPE_BOTH,
+      canShield: true,
       attackMelee: 'stick',
       attackMelee2: 'sticks',
       attackRanged: 'throw a dart at ',
@@ -201,6 +213,7 @@ class _ItemsTables
       id: 'heavyFlail',
       name: 'Heavy flail',
       type: WEAPONTYPE_MELEE,
+      canShield: true,
       attackMelee: 'smash',
       attackMelee2: 'smashes',
       damageVsMedium: [ 1, 6, 1 ], // XdY+Z
@@ -213,6 +226,7 @@ class _ItemsTables
       id: 'lightFlail',
       name: 'Light flail',
       type: WEAPONTYPE_MELEE,
+      canShield: true,
       attackMelee: 'smash',
       attackMelee2: 'smashes',
       damageVsMedium: [ 1, 4, 1 ], // XdY+Z
@@ -237,6 +251,7 @@ class _ItemsTables
       id: 'heavyWarhammer',
       name: 'Heavy war hammer',
       type: WEAPONTYPE_MELEE,
+      canShield: true,
       attackMelee: 'bludgeon',
       attackMelee2: 'bludgeons',
       damageVsMedium: [ 1, 6, 0 ], // XdY+Z
@@ -249,6 +264,7 @@ class _ItemsTables
       id: 'lightWarhammer',
       name: 'Light war hammer',
       type: WEAPONTYPE_MELEE,
+      canShield: true,
       attackMelee: 'bludgeon',
       attackMelee2: 'bludgeons',
       damageVsMedium: [ 1, 4, 1 ], // XdY+Z
@@ -273,6 +289,7 @@ class _ItemsTables
       id: 'heavyMace',
       name: 'Heavy mace',
       type: WEAPONTYPE_MELEE,
+      canShield: true,
       attackMelee: 'bludgeon',
       attackMelee2: 'bludgeons',
       damageVsMedium: [ 1, 6, 1 ], // XdY+Z
@@ -285,6 +302,7 @@ class _ItemsTables
       id: 'lightMace',
       name: 'Light mace',
       type: WEAPONTYPE_MELEE,
+      canShield: true,
       attackMelee: 'bludgeon',
       attackMelee2: 'bludgeons',
       damageVsMedium: [ 1, 4, 1 ], // XdY+Z
@@ -297,6 +315,7 @@ class _ItemsTables
       id: 'morningStar',
       name: 'Morning star',
       type: WEAPONTYPE_MELEE,
+      canShield: true,
       attackMelee: 'crush',
       attackMelee2: 'crushes',
       damageVsMedium: [ 2, 4, 0 ], // XdY+Z
@@ -309,6 +328,7 @@ class _ItemsTables
       id: 'heavyPick',
       name: 'Heavy pick',
       type: WEAPONTYPE_MELEE,
+      canShield: true,
       attackMelee: 'hit',
       attackMelee2: 'hits',
       damageVsMedium: [ 1, 6, 1 ], // XdY+Z
@@ -321,6 +341,7 @@ class _ItemsTables
       id: 'lightPick',
       name: 'Light pick',
       type: WEAPONTYPE_MELEE,
+      canShield: true,
       attackMelee: 'hit',
       attackMelee2: 'hits',
       damageVsMedium: [ 1, 4, 1 ], // XdY+Z
@@ -345,6 +366,7 @@ class _ItemsTables
       id: 'spear',
       name: 'Spear',
       type: WEAPONTYPE_BOTH,
+      canShield: true,
       attackMelee: 'impale',
       attackMelee2: 'impales',
       attackRanged: 'throw a spear at ',
@@ -396,6 +418,7 @@ class _ItemsTables
       id: 'longSword',
       name: 'Long sword',
       type: WEAPONTYPE_MELEE,
+      canShield: true,
       attackMelee: 'slash',
       attackMelee2: 'slashes',
       damageVsMedium: [ 1, 8, 0 ], // XdY+Z
@@ -408,6 +431,7 @@ class _ItemsTables
       id: 'scimitar',
       name: 'Scimitar',
       type: WEAPONTYPE_MELEE,
+      canShield: true,
       attackMelee: 'slash',
       attackMelee2: 'slashes',
       damageVsMedium: [ 1, 8, 0 ], // XdY+Z
@@ -420,6 +444,7 @@ class _ItemsTables
       id: 'shortSword',
       name: 'Short sword',
       type: WEAPONTYPE_MELEE,
+      canShield: true,
       attackMelee: 'slash',
       attackMelee2: 'slashes',
       damageVsMedium: [ 1, 6, 0 ], // XdY+Z
@@ -510,6 +535,7 @@ class _ItemsTables
       id: 'hammer',
       name: 'Hammer',
       type: WEAPONTYPE_RANGED,
+      canShield: true,
       attackRanged: 'throw a hammer at ',
       attackRanged2: 'throws a hammer at ',
       damageVsMedium: [ 1, 4, 1 ], // XdY+Z

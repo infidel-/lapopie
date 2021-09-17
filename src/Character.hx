@@ -20,6 +20,7 @@ class Character
   public var inventory: Inventory;
   public var armor: Item;
   public var weapon: Item;
+  public var shield: Item;
 
   // fake items for equipment
   var unarmedItem: Item;
@@ -50,9 +51,9 @@ class Character
       unarmedItem.weapon = _ItemsTables.weapons['unarmed'];
       weapon = unarmedItem;
       noArmorItem = new Item();
-      noArmorItem.type == ITEM_ARMOR;
+      noArmorItem.type = ITEM_ARMOR;
       noArmorItem.armor = _ItemsTables.armor['none'];
-      armor = noArmorItem;
+      armor = shield = noArmorItem;
       ac = 0;
       move = 90;
       recalc();
@@ -95,13 +96,42 @@ class Character
 // draw weapon
   public function draw(item: Item)
     {
+      // remove old
       if (weapon.weapon.id != 'unarmed')
         {
           weapon.id = inventory.getEmptyID();
           inventory.list.add(weapon);
         }
+      // drawing two-handed - remove shield
+      if (!item.weapon.canShield && shield.armor.id != 'none')
+        {
+          shield.id = inventory.getEmptyID();
+          inventory.list.add(shield);
+          shield = noArmorItem;
+        }
       inventory.list.remove(item);
       weapon = item;
+      // drawing one-handed - auto-draw shield
+      if (weapon.weapon.canShield)
+        {
+          // find best shield in inventory
+          var bestShield: Item = null;
+          for (item in inventory.list)
+            {
+              if (item.type != ITEM_ARMOR)
+                continue;
+              if (!item.armor.isShield)
+                continue;
+              if (bestShield == null ||
+                  item.armor.cost > bestShield.armor.cost)
+                bestShield = item;
+            }
+          if (bestShield != null)
+            {
+              inventory.list.remove(item);
+              shield = bestShield;
+            }
+        }
       recalc();
     }
 
@@ -125,7 +155,7 @@ class Character
   public function print(): String
     {
       var sb = new StringBuf();
-      sb.add('<span class=consoleSys>' + nameCapped + '\n' +
+      sb.add(nameCapped + '\n' +
         'STR ' + stats.str +
         (stats.str18 > 0 ? '(' + stats.str18 + ')' : '') + ', ' +
         'DEX ' + stats.dex + ', ' +
@@ -149,11 +179,15 @@ class Character
       if (wpn.type == WEAPONTYPE_RANGED) // || wpn.type == WEAPONTYPE_BOTH)
         sb.add(', range ' + wpn.range + "'");
       sb.add('\n');
-      sb.add('&nbsp;&nbsp;' + armor.armor.name + ' (AC ' +
+      if (shield.armor.id != 'none')
+        {
+          sb.add('&nbsp;&nbsp;' + shield.getName() + '\n');
+        }
+      sb.add('&nbsp;&nbsp;' + armor.getName() + ' (AC ' +
         (10 + armor.armor.ac) + ')');
       var s = sb.toString();
 //      s = s.substr(0, s.length - 2);
-      s += '</span>';
+//      s += '</span>';
       return s;
     }
 

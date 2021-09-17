@@ -42,8 +42,10 @@ class Game
       player.nameCapped = 'You';
       player.isPlayer = true;
       player.giveItem(ITEM_ARMOR, 'chain', true);
-      player.giveItem(ITEM_WEAPON, 'staff', false);
+//      player.giveItem(ITEM_WEAPON, 'staff', true);
       player.giveItem(ITEM_WEAPON, 'sling', true);
+      player.giveItem(ITEM_ARMOR, 'shieldMedium', false);
+      player.giveItem(ITEM_WEAPON, 'heavyMace', false);
       //player.giveItem(ITEM_WEAPON, 'shortBow', true);
 
       party.push(player);

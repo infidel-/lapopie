@@ -2,6 +2,7 @@ typedef _Weapon = {
   var id: String;
   var name: String;
   var type: _WeaponType;
+  @:optional var canShield: Bool;
   @:optional var attackMelee: String;
   @:optional var attackMelee2: String;
   @:optional var attackRanged: String;

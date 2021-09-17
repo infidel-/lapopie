@@ -16,6 +16,16 @@ class Item
       amount = 1;
     }
 
+// get item string ID
+  public function getID(): String
+    {
+      if (type == ITEM_WEAPON)
+        return weapon.id;
+      else if (type == ITEM_ARMOR)
+        return armor.id;
+      return '?todo?';
+    }
+
 // get item name
   public function getName(): String
     {
