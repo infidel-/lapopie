@@ -116,6 +116,17 @@ class _ItemsTables
     },
   ];
 
+// fix weapon nulls
+  public static function fixWeapons()
+    {
+      for (w in weapons)
+        if (w.type == WEAPONTYPE_BOTH ||
+            w.type == WEAPONTYPE_RANGED)
+          {
+            if (w.shots == null)
+              w.shots = 1;
+          }
+    }
   // NOTE: cost in cp (x100)
   public static var weapons: Map<String, _Weapon> = [
     // ================== MELEE WEAPONS =======================

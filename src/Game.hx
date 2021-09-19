@@ -43,9 +43,9 @@ class Game
       player.isPlayer = true;
       player.giveItem(ITEM_ARMOR, 'chain', true);
 //      player.giveItem(ITEM_WEAPON, 'staff', true);
-      player.giveItem(ITEM_WEAPON, 'sling', true);
-      player.giveItem(ITEM_ARMOR, 'shieldMedium', false);
-      player.giveItem(ITEM_WEAPON, 'heavyMace', false);
+//      player.giveItem(ITEM_WEAPON, 'sling', true);
+      player.giveItem(ITEM_ARMOR, 'shieldMedium', true);
+      player.giveItem(ITEM_WEAPON, 'heavyMace', true);
       player.giveItem(ITEM_POTION, 'healing', false);
       player.giveItem(ITEM_POTION, 'healing', false);
       player.giveItem(ITEM_POTION, 'extraHealing', false);
@@ -124,6 +124,7 @@ class Game
   static var inst: Game;
   static function main()
     {
+      _ItemsTables.fixWeapons();
       inst = new Game();
     }
 }
