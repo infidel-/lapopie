@@ -165,6 +165,19 @@ class Character
         _TablesClass.instance.dexStats[stats.dex].acAdj;
     }
 
+// print character HP
+  public function printHP(): String
+    {
+      var perc = 100.0 * hp / maxHP;
+      if (perc < 33 || (hp < maxHP && hp <= 2))
+        return '<span class=wounded33>' + hp + '</span>';
+      else if (perc < 66)
+        return '<span class=wounded66>' + hp + '</span>';
+      else if (perc < 100)
+        return '<span class=wounded99>' + hp + '</span>';
+      else return '' + hp;
+    }
+
 // print this character in console
   public function print(): String
     {
@@ -177,7 +190,7 @@ class Character
         'INT ' + stats.int + ', ' +
         'WIZ ' + stats.wiz + ', ' +
         'CHA ' + stats.cha + ' | ' +
-        'HP ' + hp + '/' + maxHP + ', ' +
+        'HP ' + printHP() + '/' + maxHP + ', ' +
         'AC ' + ac + ', ' +
         'XP ' + xp + ', ' +
         'LVL ' + level + '\n');

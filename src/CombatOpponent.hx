@@ -595,7 +595,7 @@ class CombatOpponent
         }
       else if (type == COMBAT_PARTY_MEMBER)
         {
-          s += ' (' + hp + '/' + maxHP + ' hp)';
+          s += ' (' + character.printHP() + '/' + maxHP + ' hp)';
           if (isDead)
             s += '~~';
         }
