@@ -94,5 +94,32 @@ class Const
         return group - 97;
       else return -1;
     }
+
+// standard potion drinking msg
+// amount - 1: full, 2: dose
+  public static function potionDrinkMsg(char: Character, item: Item,
+      dose: Int, isKnown: Bool): String
+    {
+      var potion = item.potion;
+      var potionName = (isKnown ?
+        potion.name.toLowerCase() :
+        'potion of some kind');
+      var doseStr = '';
+      if (dose == 1)
+        doseStr = ' a full ';
+      else if (dose == 2)
+        {
+          if (potion.doses == 2)
+            doseStr = ' a half of a ';
+          else if (potion.doses == 3)
+            doseStr = ' a third of a ';
+
+          if (item.potionDoses == 1)
+            doseStr = ' the last of a ';
+        }
+
+      return char.nameCapped + ' drink' +
+        (char.isPlayer ? '' : 's') + doseStr + ' ' + potionName;
+    }
 }
 

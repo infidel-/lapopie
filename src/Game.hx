@@ -46,6 +46,9 @@ class Game
       player.giveItem(ITEM_WEAPON, 'sling', true);
       player.giveItem(ITEM_ARMOR, 'shieldMedium', false);
       player.giveItem(ITEM_WEAPON, 'heavyMace', false);
+      player.giveItem(ITEM_POTION, 'healing', false);
+      player.giveItem(ITEM_POTION, 'healing', false);
+      player.giveItem(ITEM_POTION, 'extraHealing', false);
       //player.giveItem(ITEM_WEAPON, 'shortBow', true);
 
       party.push(player);

@@ -1,3 +1,5 @@
+import _Potion;
+
 class _ItemsTables
 {
   public static var armor: Map<String, _Armor> = [
@@ -555,6 +557,69 @@ class _ItemsTables
       range: 35,
       weight: 0.5,
       cost: 50,
+    },
+  ];
+
+  // NOTE: cost in cp (x100)
+  public static var potions: Map<String, _Potion> = [
+    // ================== POTIONS =======================
+    'healing' => {
+      id: 'healing',
+      name: 'Potion of healing',
+      note: 'Restores 2d4+2 hp. Can only be quaffed in full.',
+      doses: 1,
+      cost: 40000,
+      canDrink: function(char: Character): _DrinkResult
+        {
+          if (char.hp >= char.maxHP)
+            return {
+              result: false,
+              msg: 'That would be a waste of a good healing potion.',
+            };
+          return {
+            result: true,
+            msg: null,
+          };
+        },
+      // amount - 1: full, 2: dose
+      onDrink: function(char: Character, dose: Int): String
+        {
+          var hp = Const.dice(2, 4) + 2;
+          if (char.hp + hp > char.maxHP)
+            hp = char.maxHP - char.hp;
+          char.hp += hp;
+          return ' regaining ' + hp + ' hp.';
+        },
+    },
+    'extraHealing' => {
+      id: 'extraHealing',
+      name: 'Potion of extra-healing',
+      note: 'Restores 3d8+3 hp. Can be quaffed in three portions, each one restoring 1d8 hp.',
+      doses: 3,
+      cost: 80000,
+      canDrink: function(char: Character): _DrinkResult
+        {
+          if (char.hp >= char.maxHP)
+            return {
+              result: false,
+              msg: 'That would be a waste of a good healing potion.',
+            };
+          return {
+            result: true,
+            msg: null,
+          };
+        },
+      // amount - 1: full, 2: dose
+      onDrink: function(char: Character, dose: Int): String
+        {
+          var hp = (dose == 2 ?
+            Const.dice(1, 8) :
+            (Const.dice(3, 8) + 3));
+          if (char.hp + hp > char.maxHP)
+            hp = char.maxHP - char.hp;
+          char.hp += hp;
+          return ' regaining ' + hp + ' hp.';
+        },
     },
   ];
 }

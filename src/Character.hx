@@ -62,21 +62,7 @@ class Character
 // give item by type/string id and wear it if necessary
   public function giveItem(t: _ItemType, key: String, wear: Bool)
     {
-      if (t == ITEM_WEAPON)
-        {
-          var tmp = _ItemsTables.weapons[key];
-          if (tmp == null)
-            throw 'no such weapon: ' + key;
-
-          var item = new Item();
-          item.id = inventory.getEmptyID();
-          item.type = t;
-          item.weapon = tmp;
-          inventory.add(item);
-          if (wear)
-            draw(item);
-        }
-      else if (t == ITEM_ARMOR)
+      if (t == ITEM_ARMOR)
         {
           var tmp = _ItemsTables.armor[key];
           if (tmp == null)
@@ -90,6 +76,34 @@ class Character
             armor = item;
           else inventory.add(item);
         }
+      else if (t == ITEM_POTION)
+        {
+          var tmp = _ItemsTables.potions[key];
+          if (tmp == null)
+            throw 'no such potion: ' + key;
+
+          var item = new Item();
+          item.id = inventory.getEmptyID();
+          item.type = t;
+          item.potion = tmp;
+          item.potionDoses = item.potion.doses;
+          inventory.add(item);
+        }
+      else if (t == ITEM_WEAPON)
+        {
+          var tmp = _ItemsTables.weapons[key];
+          if (tmp == null)
+            throw 'no such weapon: ' + key;
+
+          var item = new Item();
+          item.id = inventory.getEmptyID();
+          item.type = t;
+          item.weapon = tmp;
+          inventory.add(item);
+          if (wear)
+            draw(item);
+        }
+      else throw 'Not implemented: giveItem(' + t + ')';
       recalc();
     }
 

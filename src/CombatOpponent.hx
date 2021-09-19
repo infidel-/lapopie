@@ -16,13 +16,16 @@ class CombatOpponent
   public var wasAttacked: Int;
   public var declaredAction: _CombatAction;
   public var targetID: Int; // group id, inventory item id
+  public var drinkDose: Int;
   public var lastChargeRound: Int;
 
   // common vars
   public var name: String;
   public var nameCapped: String;
-  public var hp: Int;
-  public var maxHP: Int;
+  public var hp(get, set): Int;
+  public var maxHP(get, never): Int;
+  var _hp: Int; // monster only
+  var _maxHP: Int;
   public var group: Int;
   public var x: Int;
 
@@ -32,10 +35,10 @@ class CombatOpponent
       combat = game.combat;
       name = '?';
       nameCapped = '?';
-      hp = 0;
-      maxHP = 0;
       group = 0;
       x = 0;
+      _hp = 0;
+      _maxHP = 0;
       lastChargeRound = -10;
       declaredAction = ACTION_WAIT;
       targetID = 0;
@@ -44,6 +47,7 @@ class CombatOpponent
       isEnemy = false;
       isDead = false;
       wasAttacked = 0;
+      drinkDose = 0;
     }
 
 // clear state
@@ -58,13 +62,14 @@ class CombatOpponent
     {
       if (type == COMBAT_MONSTER)
         {
-          hp = maxHP = Const.dice(monster.hitDice[0], monster.hitDice[1]) +
+          _hp = _maxHP =
+            Const.dice(monster.hitDice[0], monster.hitDice[1]) +
             monster.hitDice[2];
         }
       else if (type == COMBAT_PARTY_MEMBER)
         {
-          hp = character.hp;
-          maxHP = character.maxHP;
+//          hp = character.hp;
+//          maxHP = character.maxHP;
         }
     }
 
@@ -163,6 +168,27 @@ class CombatOpponent
           else log(segment, nameCapped + ' draw' +
             (isPlayer ? '' : 's') + ' a ' +
             item.getNameLower() + '.');
+        }
+      else if (declaredAction == ACTION_DRINK)
+        {
+          var item = character.inventory.getByID(targetID);
+          var msg = Const.potionDrinkMsg(character, item,
+            drinkDose, !isEnemy);
+          var ret = item.potion.onDrink(character, drinkDose);
+          if (!isEnemy)
+            msg += ret;
+          else msg += '.';
+          log(segment, msg);
+          if (drinkDose == 1)
+            {
+              character.inventory.remove(item);
+            }
+          else if (drinkDose == 2)
+            {
+              item.potionDoses--;
+              if (item.potionDoses == 0)
+                character.inventory.remove(item);
+            }
         }
       else if (declaredAction == ACTION_WAIT)
         {
@@ -577,6 +603,33 @@ class CombatOpponent
           s += ' <span class=consoleDebug>[x: ' + x + ']</span>';
 #end
       return s + '\n';
+    }
+
+  function get_hp(): Int
+    {
+      if (type == COMBAT_PARTY_MEMBER || type == COMBAT_NPC)
+        return character.hp;
+      else if (type == COMBAT_MONSTER)
+        return _hp;
+      return _hp;
+    }
+
+  function set_hp(v: Int): Int
+    {
+      if (type == COMBAT_PARTY_MEMBER || type == COMBAT_NPC)
+        character.hp = v;
+      else if (type == COMBAT_MONSTER)
+        _hp = v;
+      return v;
+    }
+
+  function get_maxHP(): Int
+    {
+      if (type == COMBAT_PARTY_MEMBER || type == COMBAT_NPC)
+        return character.maxHP;
+      else if (type == COMBAT_MONSTER)
+        return _maxHP;
+      return _maxHP;
     }
 }
 

@@ -263,6 +263,63 @@ class Combat
           player.targetID = item.id;
         }
 
+      // drink
+      else if (cmd == 'drink')
+        {
+          if (tokens.length == 0 || tokens[0].length > 1)
+            {
+              player.character.inventory.print(ITEM_POTION);
+              game.console.print('Usage: drink &lt;item letter&gt; [&lt;full|dose&gt;]');
+              return -1;
+            }
+
+          var itemIndex = Const.letterToNum(tokens[0]);
+          var item = player.character.inventory.get(ITEM_POTION, itemIndex);
+          if (item == null)
+            {
+              game.console.print('There is no such item in your inventory.');
+              return -1;
+            }
+          var dose = 1;
+          if (tokens.length > 1)
+            {
+              var key = tokens[1];
+              var am = [
+                'full' => 1,
+                'dose' => 2,
+              ];
+              dose = am[key];
+              if (am[key] == null)
+                {
+                  var doses = '';
+                  if (item.potion.doses == 1)
+                    doses = 'full';
+                  else if (item.potion.doses > 1)
+                    doses = 'full, dose';
+                  game.console.print('Doses accepted: ' + doses + '.');
+                  return -1;
+                }
+            }
+          if (dose == 1 && item.potion.doses > 1 &&
+              item.potionDoses < item.potion.doses)
+            dose = 2;
+          if (getGroupEnemies(player.group, player.isEnemy) > 0)
+            {
+              game.console.print('You cannot drink potions while engaging in melee combat.');
+              return -1;
+            }
+          var ret = item.potion.canDrink(player.character);
+          if (!ret.result)
+            {
+              game.console.print(ret.msg);
+              return -1;
+            }
+
+          player.declaredAction = ACTION_DRINK;
+          player.targetID = item.id;
+          player.drinkDose = dose;
+        }
+
       // retreat
       else if (cmd == 'retreat')
         {
@@ -395,6 +452,7 @@ class Combat
         playerRoll + ', enemy side ' + enemyRoll);
 
       // set order according to initiative with dex mods
+      // potions move later in order
       var order = new Map<Int, Array<CombatOpponent>>();
       for (op in opponents)
         if (!op.isDead)
@@ -405,8 +463,13 @@ class Combat
                 (op.type == COMBAT_PARTY_MEMBER ||
                  op.type == COMBAT_NPC))
               segment -= op.character.dexStats.missileBonusToHit;
+            // drink works 1d4+1 segments later this(!) turn
+            else if (op.declaredAction == ACTION_DRINK)
+              segment += Const.dice(1, 4) + 1;
             if (segment < 1)
               segment = 1;
+            if (segment > 10)
+              segment = 10;
             var list = order[segment];
             if (list == null)
               {
@@ -529,6 +592,12 @@ class Combat
       variants: [ 'draw', 'd' ],
       args: '<item letter>',
       help: 'Draw another weapon from inventory. Shows a list of weapons without arguments.',
+    },
+    {
+      id: 'drink',
+      variants: [ 'drink', 'quaff', 'q' ],
+      args: '<item letter> [<full|half|third>]',
+      help: 'Quaff a potion from inventory in full or partially if possible. Shows a list of potions without arguments.',
     },
     {
       id: 'move',

@@ -30,6 +30,13 @@ class Inventory
       // TODO stacking
     }
 
+// remove item
+  public function remove(item: Item, ?amount: Int = 1)
+    {
+      list.remove(item);
+      // TODO stacking
+    }
+
 // print all items of a given type
   public function print(?type: _ItemType = null)
     {
@@ -40,7 +47,7 @@ class Inventory
           if (type != null && item.type != type)
             continue;
           s += String.fromCharCode(97 + idx) + ') ' +
-            item.getName() + '\n';
+            item.print() + '\n';
           idx++;
         }
       game.console.print(s);
