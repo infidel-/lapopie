@@ -65,4 +65,16 @@ class Item
     {
       return getName().toLowerCase();
     }
+
+// get item note
+  public function getNote(): String
+    {
+      if (type == ITEM_WEAPON)
+        return '?todo?';
+      else if (type == ITEM_ARMOR)
+        return '?todo?';
+      else if (type == ITEM_POTION)
+        return potion.note;
+      return '?todo?';
+    }
 }

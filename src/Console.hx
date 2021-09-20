@@ -96,11 +96,12 @@ class Console
           if (tokens.length == 0)
             {
               var s = 'Commonly available commands: ' +
-                'again (g), inventory (inv, i), party/stats, who\n';
+                'again (g), examine (x), look at (look, l), inventory (inv, i), party/stats\n';
               if (game.state == STATE_LOCATION)
                 s += 'Location commands: ' +
-                  'enter, examine (x), exit, go, ' +
-                  'look (l), roll (r), talk (t), use (u), wait (z)';
+//                  'enter, exit, go, ' +
+//                  'roll (r), talk (t), use (u), wait (z)';
+                  'wait (z)';
               else if (game.state == STATE_COMBAT)
                 s += game.combat.getCommandList();
               system(s);
@@ -233,6 +234,10 @@ class Console
           var obj = game.location.getEnabledObject(tokens[0]);
           if (obj == null)
             {
+              // try inventory
+              if (game.player.inventory.examine(tokens) == 1)
+                return 1;
+
               system("I did not understand what that referred to.");
               return -1;
             }

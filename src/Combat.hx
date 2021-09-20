@@ -174,6 +174,24 @@ class Combat
           player.declaredAction = ACTION_WAIT;
         }
 
+      else if (cmd == 'examine')
+        {
+          if (tokens.length == 0)
+            {
+              game.console.print('You are currently in combat.');
+              return 1;
+            }
+
+          // try inventory
+          if (game.player.inventory.examine(tokens) == 1)
+            return 1;
+          else
+            {
+              game.console.print('I do not know what that is.');
+              return -1;
+            }
+        }
+
       // attack
       else if (cmd == 'attack')
         {
@@ -591,13 +609,19 @@ class Combat
       id: 'draw',
       variants: [ 'draw', 'd' ],
       args: '<item letter>',
-      help: 'Draw another weapon from inventory. Shows a list of weapons without arguments.',
+      help: 'Declare that the player character wants to draw another weapon from the inventory. Shows a list of weapons without arguments.',
     },
     {
       id: 'drink',
       variants: [ 'drink', 'quaff', 'q' ],
       args: '<item letter> [<full|half|third>]',
-      help: 'Quaff a potion from inventory in full or partially if possible. Shows a list of potions without arguments.',
+      help: 'Declare that the player character wants to quaff a potion from the inventory in full or partially if possible. Shows a list of potions without arguments.',
+    },
+    {
+      id: 'examine',
+      variants: [ 'examine', 'x', 'look at', 'look', 'l' ],
+      args: '<item>',
+      help: 'Examine an item in player inventory. For the sake of convenience this action does not take time.',
     },
     {
       id: 'move',

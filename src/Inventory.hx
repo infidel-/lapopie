@@ -30,6 +30,26 @@ class Inventory
       // TODO stacking
     }
 
+// examine an item in the inventory
+// 0 - no item found
+// 1 - item found, examined
+  public function examine(tokens: Array<String>): Int
+    {
+      // find item by name
+      var name = tokens.join(' ');
+      var item = null;
+      for (it in list)
+        if (it.getNameLower() == name)
+          {
+            item = it;
+            break;
+          }
+      if (item == null)
+        return 0;
+      game.console.print(item.getNote());
+      return 1;
+    }
+
 // remove item
   public function remove(item: Item, ?amount: Int = 1)
     {
