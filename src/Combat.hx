@@ -138,7 +138,7 @@ class Combat
     {
       // print all groups
       var maxGroup = getMaxGroup();
-      game.console.print('Round ' + round);
+      p('Round ' + round);
       for (group in 0...maxGroup + 1)
         {
           // find group x for 
@@ -157,7 +157,7 @@ class Combat
 
               s += op.print();
             }
-          game.console.print(s);
+          p(s);
         }
     }
 
@@ -178,7 +178,7 @@ class Combat
         {
           if (tokens.length == 0)
             {
-              game.console.print('You are currently in combat.');
+              p('You are currently in combat.');
               return 1;
             }
 
@@ -187,7 +187,7 @@ class Combat
             return 1;
           else
             {
-              game.console.print('I do not know what that is.');
+              p('I do not know what that is.');
               return -1;
             }
         }
@@ -197,13 +197,13 @@ class Combat
         {
           if (getGroupEnemies(player.group, player.isEnemy) == 0)
             {
-              game.console.print('There are no enemies close to you.');
+              p('There are no enemies close to you.');
               return -1;
             }
           if (player.character.weapon.weapon.type != WEAPONTYPE_MELEE &&
               player.character.weapon.weapon.type != WEAPONTYPE_BOTH)
             {
-              game.console.print('You don\'t have a melee weapon drawn.');
+              p('You don\'t have a melee weapon drawn.');
               return -1;
             }
           player.declaredAction = ACTION_ATTACK;
@@ -214,46 +214,46 @@ class Combat
         {
           if (tokens.length == 0 || tokens[0].length > 1)
             {
-              game.console.print('Usage: charge &lt;group letter&gt;');
+              p('Usage: charge &lt;group letter&gt;');
               return -1;
             }
 
           var group = Const.letterToNum(tokens[0]);
           if (player.group == group)
             {
-              game.console.print('You are in that group.');
+              p('You are in that group.');
               return -1;
             }
           if (getGroupMembers(group) == 0)
             {
-              game.console.print('No such combat group.');
+              p('No such combat group.');
               return -1;
             }
           if (getGroupEnemies(group, player.isEnemy) == 0)
             {
-              game.console.print('That group has no opponents.');
+              p('That group has no opponents.');
               return -1;
             }
           if (getGroupEnemies(player.group, player.isEnemy) > 0)
             {
-              game.console.print('You are engaged in melee.');
+              p('You are engaged in melee.');
               return -1;
             }
           if (player.distanceToGroup(group) > player.character.move * 2)
             {
-              game.console.print('That group is too far away.');
+              p('That group is too far away.');
               return -1;
             }
           if (round - player.lastChargeRound < 10)
             {
-              game.console.print('You have to wait ' +
+              p('You have to wait ' +
                 (10 - round + player.lastChargeRound) + ' more rounds before charging.');
               return -1;
             }
           if (player.character.weapon.weapon.type != WEAPONTYPE_MELEE &&
               player.character.weapon.weapon.type != WEAPONTYPE_BOTH)
             {
-              game.console.print('You cannot charge without a melee weapon drawn.');
+              p('You cannot charge without a melee weapon drawn.');
               return -1;
             }
           player.declaredAction = ACTION_CHARGE;
@@ -266,7 +266,7 @@ class Combat
           if (tokens.length == 0 || tokens[0].length > 1)
             {
               player.character.inventory.print(ITEM_WEAPON);
-              game.console.print('Usage: draw &lt;item letter&gt;');
+              p('Usage: draw &lt;item letter&gt;');
               return -1;
             }
 
@@ -274,7 +274,7 @@ class Combat
           var item = player.character.inventory.get(ITEM_WEAPON, itemIndex);
           if (item == null)
             {
-              game.console.print('There is no such item in your inventory.');
+              p('There is no such item in your inventory.');
               return -1;
             }
           player.declaredAction = ACTION_DRAW;
@@ -287,7 +287,7 @@ class Combat
           if (tokens.length == 0 || tokens[0].length > 1)
             {
               player.character.inventory.print(ITEM_POTION);
-              game.console.print('Usage: drink &lt;item letter&gt; [&lt;full|dose&gt;]');
+              p('Usage: drink &lt;item letter&gt; [&lt;full|dose&gt;]');
               return -1;
             }
 
@@ -295,7 +295,7 @@ class Combat
           var item = player.character.inventory.get(ITEM_POTION, itemIndex);
           if (item == null)
             {
-              game.console.print('There is no such item in your inventory.');
+              p('There is no such item in your inventory.');
               return -1;
             }
           var dose = 1;
@@ -314,7 +314,7 @@ class Combat
                     doses = 'full';
                   else if (item.potion.doses > 1)
                     doses = 'full, dose';
-                  game.console.print('Doses accepted: ' + doses + '.');
+                  p('Doses accepted: ' + doses + '.');
                   return -1;
                 }
             }
@@ -323,13 +323,13 @@ class Combat
             dose = 2;
           if (getGroupEnemies(player.group, player.isEnemy) > 0)
             {
-              game.console.print('You cannot drink potions while engaging in melee combat.');
+              p('You cannot drink potions while engaging in melee combat.');
               return -1;
             }
           var ret = item.potion.canDrink(player.character);
           if (!ret.result)
             {
-              game.console.print(ret.msg);
+              p(ret.msg);
               return -1;
             }
 
@@ -343,7 +343,7 @@ class Combat
         {
           if (getGroupEnemies(player.group, player.isEnemy) == 0)
             {
-              game.console.print('You are not in a melee.');
+              p('You are not in a melee.');
               return -1;
             }
           player.isParrying = true;
@@ -355,7 +355,7 @@ class Combat
         {
           if (player.character.weapon.weapon.id == 'unarmed')
             {
-              game.console.print('You cannot parry without a melee weapon.');
+              p('You cannot parry without a melee weapon.');
               return -1;
             }
           player.isParrying = true;
@@ -367,7 +367,7 @@ class Combat
         {
           if (tokens.length == 0 || tokens[0].length > 1)
             {
-              game.console.print('Usage: move|close &lt;group letter&gt;');
+              p('Usage: move|close &lt;group letter&gt;');
               return -1;
             }
 
@@ -380,12 +380,12 @@ class Combat
             group -= 97;
           if (player.group == group)
             {
-              game.console.print('You are in that group.');
+              p('You are in that group.');
               return -1;
             }
           if (getGroupMembers(group) == 0)
             {
-              game.console.print('No such combat group.');
+              p('No such combat group.');
               return -1;
             }
           player.declaredAction = ACTION_MOVE;
@@ -397,40 +397,40 @@ class Combat
         {
           if (tokens.length == 0 || tokens[0].length > 1)
             {
-              game.console.print('Usage: shoot &lt;group letter&gt;');
+              p('Usage: shoot &lt;group letter&gt;');
               return -1;
             }
 
           var group = Const.letterToNum(tokens[0]);
           if (player.group == group)
             {
-              game.console.print('You are in that group.');
+              p('You are in that group.');
               return -1;
             }
           if (getGroupMembers(group) == 0)
             {
-              game.console.print('No such combat group.');
+              p('No such combat group.');
               return -1;
             }
           if (getGroupEnemies(group, player.isEnemy) == 0)
             {
-              game.console.print('That group has no opponents.');
+              p('That group has no opponents.');
               return -1;
             }
           if (getGroupEnemies(player.group, player.isEnemy) > 0)
             {
-              game.console.print('You are engaged in melee.');
+              p('You are engaged in melee.');
               return -1;
             }
           if (player.character.weapon.weapon.type != WEAPONTYPE_RANGED &&
               player.character.weapon.weapon.type != WEAPONTYPE_BOTH)
             {
-              game.console.print('You cannot shoot without a ranged weapon drawn.');
+              p('You cannot shoot without a ranged weapon drawn.');
               return -1;
             }
           if (player.distanceToGroup(group) > player.character.weapon.weapon.range * 4)
             {
-              game.console.print('That group is too far away.');
+              p('That group is too far away.');
               return -1;
             }
           player.declaredAction = ACTION_SHOOT;
@@ -466,7 +466,7 @@ class Combat
           playerRoll = 1;
           enemyRoll = 6;
         }
-      game.console.print('Roll initiative (1d6): player side ' +
+      p('Roll initiative (1d6): player side ' +
         playerRoll + ', enemy side ' + enemyRoll);
 
       // set order according to initiative with dex mods
@@ -509,7 +509,7 @@ class Combat
             if (!op.isDead)
               op.resolveAction(segment);
         }
-      game.console.print(logRound);
+      p(logRound);
       round++;
 
       // clear opponent state
@@ -532,7 +532,7 @@ class Combat
       for (op in opponents)
         if (op.isEnemy && !op.isDead)
           return;
-      game.console.print('The battle is over. You are victorious.');
+      p('The battle is over. You are victorious.');
       game.console.printNarrative('Your first test is over, but many more await you in the future. Thank you for playing!');
       game.state = STATE_LOCATION;
     }
@@ -553,6 +553,11 @@ class Combat
         }
       s = s.substr(0, s.length - 2);
       return s;
+    }
+
+  inline function p(s: String)
+    {
+      game.console.print(s);
     }
 
 // get command info

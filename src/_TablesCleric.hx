@@ -7,6 +7,8 @@ class _TablesCleric extends _TablesClass
       hitDie = 8; // d8
     }
   public static var toHitPenaltyNonProf = -3;
+  // str, dex, con, int, wis, cha
+  public static var minStats = [ 6, 3, 6, 6, 9, 6 ];
 
 // roll required to hit armor class
   static var levelToMod = [ 1, 0, 0, 0, -2, -2, -2, -4, -4, -4, -6, -6, -6 ];
@@ -116,7 +118,7 @@ class _TablesCleric extends _TablesClass
     },
   ];
 
-  public static var wisdom = [
+  public var wisStats = [
     9 => {
       bonusSpells: [ 0, 0, 0, 0 ],
       spellFailureChance: 15,

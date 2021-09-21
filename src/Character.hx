@@ -42,8 +42,13 @@ class Character
       isPlayer = false;
       name = '?';
       nameCapped = '?';
-      hp = maxHP = Const.dice(1, classTables.hitDie) +
-        classTables.conStats[stats.con].hpBonus;
+      while (true)
+        {
+          hp = maxHP = Const.dice(1, classTables.hitDie) +
+            classTables.conStats[stats.con].hpBonus;
+          if (hp >= 4)
+            break;
+        }
       xp = 0;
       level = 1;
       unarmedItem = new Item();
@@ -73,7 +78,11 @@ class Character
           item.type = t;
           item.armor = tmp;
           if (wear)
-            armor = item;
+            {
+              if (tmp.isShield)
+                shield = item;
+              else armor = item;
+            }
           else inventory.add(item);
         }
       else if (t == ITEM_POTION)
@@ -188,7 +197,7 @@ class Character
         'DEX ' + stats.dex + ', ' +
         'CON ' + stats.con + ', ' +
         'INT ' + stats.int + ', ' +
-        'WIZ ' + stats.wiz + ', ' +
+        'WIS ' + stats.wis + ', ' +
         'CHA ' + stats.cha + ' | ' +
         'HP ' + printHP() + '/' + maxHP + ', ' +
         'AC ' + ac + ', ' +

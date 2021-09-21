@@ -338,5 +338,149 @@ class _TablesClass
     },
   ];
 
+  // WISDOM
+  public var wisStatsCommon = [
+    3 => {
+      mentalSavingThrowBonus: -3,
+    },
+    4 => {
+      mentalSavingThrowBonus: -2,
+    },
+    5 => {
+      mentalSavingThrowBonus: -1,
+    },
+    6 => {
+      mentalSavingThrowBonus: -1,
+    },
+    7 => {
+      mentalSavingThrowBonus: -1,
+    },
+    8 => {
+      mentalSavingThrowBonus: 0,
+    },
+    9 => {
+      mentalSavingThrowBonus: 0,
+    },
+    10 => {
+      mentalSavingThrowBonus: 0,
+    },
+    11 => {
+      mentalSavingThrowBonus: 0,
+    },
+    12 => {
+      mentalSavingThrowBonus: 0,
+    },
+    13 => {
+      mentalSavingThrowBonus: 0,
+    },
+    14 => {
+      mentalSavingThrowBonus: 0,
+    },
+    15 => {
+      mentalSavingThrowBonus: 1,
+    },
+    16 => {
+      mentalSavingThrowBonus: 2,
+    },
+    17 => {
+      mentalSavingThrowBonus: 3,
+    },
+    18 => {
+      mentalSavingThrowBonus: 4,
+    },
+    19 => {
+      mentalSavingThrowBonus: 5,
+    },
+  ];
+
+  // CHARISMA
+  public var chaStats = [
+    3 => {
+      maxHenchmen: 1,
+      loyaltyBonus: -30,
+      reactionBonus: -25,
+    },
+    4 => {
+      maxHenchmen: 1,
+      loyaltyBonus: -25,
+      reactionBonus: -20,
+    },
+    5 => {
+      maxHenchmen: 2,
+      loyaltyBonus: -20,
+      reactionBonus: -15,
+    },
+    6 => {
+      maxHenchmen: 2,
+      loyaltyBonus: -15,
+      reactionBonus: -10,
+    },
+    7 => {
+      maxHenchmen: 3,
+      loyaltyBonus: -10,
+      reactionBonus: -5,
+    },
+    8 => {
+      maxHenchmen: 3,
+      loyaltyBonus: -5,
+      reactionBonus: 0,
+    },
+    9 => {
+      maxHenchmen: 4,
+      loyaltyBonus: 0,
+      reactionBonus: 0,
+    },
+    10 => {
+      maxHenchmen: 4,
+      loyaltyBonus: 0,
+      reactionBonus: 0,
+    },
+    11 => {
+      maxHenchmen: 4,
+      loyaltyBonus: 0,
+      reactionBonus: 0,
+    },
+    12 => {
+      maxHenchmen: 5,
+      loyaltyBonus: 0,
+      reactionBonus: 0,
+    },
+    13 => {
+      maxHenchmen: 5,
+      loyaltyBonus: 0,
+      reactionBonus: 5,
+    },
+    14 => {
+      maxHenchmen: 6,
+      loyaltyBonus: 5,
+      reactionBonus: 10,
+    },
+    15 => {
+      maxHenchmen: 7,
+      loyaltyBonus: 15,
+      reactionBonus: 15,
+    },
+    16 => {
+      maxHenchmen: 8,
+      loyaltyBonus: 20,
+      reactionBonus: 25,
+    },
+    17 => {
+      maxHenchmen: 10,
+      loyaltyBonus: 30,
+      reactionBonus: 30,
+    },
+    18 => {
+      maxHenchmen: 15,
+      loyaltyBonus: 40,
+      reactionBonus: 35,
+    },
+    19 => {
+      maxHenchmen: 20,
+      loyaltyBonus: 50,
+      reactionBonus: 40,
+    },
+  ];
+
   public static var instance = new _TablesClass();
 }

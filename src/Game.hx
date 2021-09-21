@@ -1,6 +1,7 @@
 @:expose
 class Game
 {
+  public var chargen: Chargen;
   public var console: Console;
   public var scene: Scene;
   public var location: Location;
@@ -18,26 +19,28 @@ class Game
   public function new()
     {
       isOver = false;
-      _state = STATE_LOCATION;
+      _state = STATE_CHARGEN;
       location = null;
       extendedInfo = true;
       combat = new Combat(this);
+      chargen = new Chargen(this);
       debug = {
         initiative: false,
       };
       party = [];
+      console = new Console(this);
+      console.print('### Welcome to Lapopie DEMO.');
+      console.print('Let\'s start with generating your character.');
+      chargen.print();
+    }
 
+// start new game (after chargen is over)
+  public function start(playerStats: Stats)
+    {
+      state = STATE_LOCATION;
       // ============== DEMO SETUP ================
       // player
-      player = new Character(this, CLASS_CLERIC, {
-        str: 6 + Const.dice(2,6),
-        str18: -1,
-        dex: 6 + Const.dice(2,6),
-        con: 6 + Const.dice(2,6),
-        int: 6 + Const.dice(2,6),
-        cha: 6 + Const.dice(2,6),
-        wiz: 6 + Const.dice(2,6),
-      });
+      player = new Character(this, CLASS_CLERIC, playerStats);
       player.name = 'you';
       player.nameCapped = 'You';
       player.isPlayer = true;
@@ -50,7 +53,6 @@ class Game
       player.giveItem(ITEM_POTION, 'healing', false);
       player.giveItem(ITEM_POTION, 'extraHealing', false);
       //player.giveItem(ITEM_WEAPON, 'shortBow', true);
-
       party.push(player);
 
       // jean
@@ -61,17 +63,15 @@ class Game
         con: 6 + Const.dice(2,6),
         int: 6 + Const.dice(2,6),
         cha: 6 + Const.dice(2,6),
-        wiz: 6 + Const.dice(2,6),
+        wis: 6 + Const.dice(2,6),
       });
       jean.name = 'Jean';
       jean.nameCapped = 'Jean';
       jean.giveItem(ITEM_ARMOR, 'studded', true);
       jean.giveItem(ITEM_WEAPON, 'club', true);
       party.push(jean);
-      console = new Console(this);
 
       // temp start
-      console.print('### Welcome to Lapopie DEMO.');
       console.printNarrative("The dusk came over the Rez forest. You and your companion were settling in for an evening by the fire near the road leading to Lapopie. But then you've heard a distant howling from somewhere in the thick woods...");
       scene = new infos.ForestRoadDemo(this);
       console.runCommand('stats');

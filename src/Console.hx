@@ -27,6 +27,8 @@ class Console
       var ignored = Const.ignoredKeywords;
       if (game.state == STATE_COMBAT)
         ignored = Const.ignoredCombatKeywords;
+      if (game.state == STATE_CHARGEN)
+        ignored = [];
       for (x in tmp)
         {
           if (!Lambda.has(ignored, x))
@@ -38,6 +40,10 @@ class Console
 
       var cmd = tokens.shift();
       tokensFull.shift();
+
+      // character generation commands
+      if (game.state == STATE_CHARGEN)
+        return game.chargen.runCommand(cmd, tokens);
 
       // try common commands first
       var ret = runCommandCommon(cmd, tokens);

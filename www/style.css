@@ -1,3 +1,7 @@
+:root {
+  --text-fg-color: #eee;
+}
+
 html,
 body {
   min-height: 100%;
@@ -6,7 +10,7 @@ body {
 body {
   background-color: #ececec;
   background:linear-gradient(#030d0f, #333333, #3a3a3c);
-  color: #eee;
+  color: var(--text-fg-color);
   /*padding: 0.5em 1em;*/
   -webkit-font-smoothing: antialiased;
 }
@@ -39,6 +43,10 @@ p {
 
 .wounded33 {
   color: #ff0000;
+}
+
+.red {
+  color: #ff2222;
 }
 
 .todo {
@@ -90,6 +98,10 @@ p {
   line-height: 1.0;
 }
 
+.normal {
+  color: var(--text-fg-color);
+}
+
 .console {
   position: fixed;
 /*
@@ -101,7 +113,7 @@ p {
   font-family: 'Cousine', monospace;
   font-size: 16px;
   letter-spacing: 0.04em;
-  color: #eee;
+  color: var(--text-fg-color);
   width: calc(100% - 3em);
   max-width: 100%;
   max-height: calc(100% - 3em);
