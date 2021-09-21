@@ -101,7 +101,9 @@ class Console
         {
           if (tokens.length == 0)
             {
-              var s = 'Commonly available commands: ' +
+              var s = 
+                'Type "help &lt;command&gt;" to read command help.\n' +
+                'Commonly available commands: ' +
                 'again (g), examine (x), look at (look, l), inventory (inv, i), party/stats\n';
               if (game.state == STATE_LOCATION)
                 s += 'Location commands: ' +

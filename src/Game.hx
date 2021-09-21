@@ -32,6 +32,12 @@ class Game
       console.print('### Welcome to Lapopie DEMO.');
       console.print('Let\'s start with generating your character.');
       chargen.print();
+
+      // DEBUG: auto chargen commands
+      console.runCommand('b');
+      while (@:privateAccess chargen.stats.checkMin(_TablesCleric.minStats) != '')
+        console.runCommand('r');
+      console.runCommand('start');
     }
 
 // start new game (after chargen is over)
@@ -76,6 +82,8 @@ class Game
       scene = new infos.ForestRoadDemo(this);
       console.runCommand('stats');
       scene.enter();
+      console.print('_Note: You can only "wait" on this scene so far._');
+      console.print('<u>Hint: Use "help" command.</u>');
 
       // DEBUG: auto commands
 //      console.runCommand('dbg init');

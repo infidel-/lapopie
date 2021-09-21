@@ -108,6 +108,7 @@ class Combat
 // start combat with current opponents
   public function start()
     {
+      p('**COMBAT BEGINS**');
       // add party members (in front)
       for (i in 0...game.party.length)
         {
