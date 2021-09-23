@@ -92,7 +92,7 @@ class Options
       id: 'font',
       type: 'string',
       name: 'Font family',
-      values: [ 'crimson', 'monospace' ],
+	  values: [ 'crimson', 'dos', 'monospace', 'ps55', 'vt323' ],
     },
     'fontsize' => {
       id: 'fontSize',
