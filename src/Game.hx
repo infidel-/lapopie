@@ -36,10 +36,12 @@ class Game
       chargen.print();
 
       // DEBUG: auto chargen commands
+#if mydebug
       console.runCommand('b');
       while (@:privateAccess chargen.stats.checkMin(_TablesCleric.minStats) != '')
         console.runCommand('r');
       console.runCommand('start');
+#end
     }
 
 // start new game (after chargen is over)
@@ -87,6 +89,7 @@ class Game
       console.print('_Note: You can only "wait" on this scene so far._');
       console.print('<u>Hint: Use "help" command.</u>');
 
+#if mydebug
 /*
       // DEBUG: auto commands
 //      console.runCommand('dbg init');
@@ -94,6 +97,7 @@ class Game
         console.runCommand('z');
 //      scene.moveTo('reflection');
 */
+#end
     }
 
 // time passing
