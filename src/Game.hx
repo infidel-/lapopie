@@ -2,6 +2,7 @@
 class Game
 {
   public var chargen: Chargen;
+  public var options: Options;
   public var console: Console;
   public var scene: Scene;
   public var location: Location;
@@ -22,6 +23,7 @@ class Game
       _state = STATE_CHARGEN;
       location = null;
       extendedInfo = true;
+      options = new Options(this);
       combat = new Combat(this);
       chargen = new Chargen(this);
       debug = {
@@ -85,11 +87,13 @@ class Game
       console.print('_Note: You can only "wait" on this scene so far._');
       console.print('<u>Hint: Use "help" command.</u>');
 
+/*
       // DEBUG: auto commands
 //      console.runCommand('dbg init');
       for (i in 0...4)
         console.runCommand('z');
 //      scene.moveTo('reflection');
+*/
     }
 
 // time passing

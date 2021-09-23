@@ -538,68 +538,12 @@ class Combat
       game.state = STATE_LOCATION;
     }
 
-// get commands list for help command
-  public function getCommandList(): String
-    {
-      var s = 'Combat commands: ';
-      for (c in commands)
-        {
-          for (v in 0...c.variants.length)
-            {
-              if (v == 0)
-                s += c.variants[v] + ' (';
-              else s += c.variants[v] + ', ';
-            }
-          s = s.substr(0, s.length - 2) + '), ';
-        }
-      s = s.substr(0, s.length - 2);
-      return s;
-    }
-
   inline function p(s: String)
     {
       game.console.print(s);
     }
 
-// get command info
-  public static function getCommandInfo(cmds: String): _CombatCommand
-    {
-      // find command
-      var cmd = null;
-      for (c in commands)
-        {
-          for (v in c.variants)
-            if (cmds == v)
-              {
-                cmd = c;
-                break;
-              }
-          if (cmd != null)
-            break;
-        }
-      return cmd;
-    }
-
-// get command help string
-  public static function getCommandHelp(cmds: String): String
-    {
-      // find command
-      var cmd = getCommandInfo(cmds);
-      if (cmd == null)
-        return null;
-
-      // form string
-      var s = '';
-      for (v in cmd.variants)
-        s += v + ', ';
-      s = s.substr(0, s.length - 2) +
-        (cmd.args != null ? ' ' + cmd.args : '') +
-        ' - ' + cmd.help;
-
-      return s;
-    }
-
-  public static var commands: Array<_CombatCommand> = [
+  public static var commands: Array<_ConsoleCommand> = [
     {
       id: 'attack',
       variants: [ 'attack', 'a' ],
@@ -657,11 +601,4 @@ class Combat
       help: 'Declare that the player character waits for one round.',
     },
   ];
-}
-
-typedef _CombatCommand = {
-  var id: String;
-  var variants: Array<String>;
-  @:optional var args: String;
-  var help: String;
 }

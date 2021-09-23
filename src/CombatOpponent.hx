@@ -570,10 +570,10 @@ class CombatOpponent
 // print opponent info
   public function print(): String
     {
-      var s = '&nbsp;&nbsp;';
+      var s = '&nbsp;&nbsp;&nbsp;&nbsp;';
       if (isDead)
         s += '~~';
-      s += nameCapped;
+      s += '**' + nameCapped + '**';
       if (type == COMBAT_MONSTER)
         {
           if (hp > 0)

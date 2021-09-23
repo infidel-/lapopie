@@ -1,5 +1,7 @@
 // game constants
 
+import js.Browser;
+
 class Const
 {
 // these keywords are ignored by the command parser
@@ -120,6 +122,25 @@ class Const
 
       return char.nameCapped + ' drink' +
         (char.isPlayer ? '' : 's') + doseStr + ' ' + potionName;
+    }
+
+// get CSS variable
+  public static inline function getVar(s: String): String
+    {
+      return Browser.window.getComputedStyle(
+        Browser.document.documentElement).getPropertyValue(s);
+    }
+
+// get CSS variable as int
+  public static inline function getVarInt(s: String): Int
+    {
+      return Std.parseInt(getVar(s));
+    }
+
+// set CSS variable
+  public static inline function setVar(key: String, val: String)
+    {
+      return Browser.document.documentElement.style.setProperty(key, val);
     }
 }
 

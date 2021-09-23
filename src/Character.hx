@@ -191,7 +191,7 @@ class Character
   public function print(): String
     {
       var sb = new StringBuf();
-      sb.add(nameCapped + '\n' +
+      sb.add('**' + nameCapped + '**\n' +
         'STR ' + stats.str +
         (stats.str18 > 0 ? '(' + stats.str18 + ')' : '') + ', ' +
         'DEX ' + stats.dex + ', ' +

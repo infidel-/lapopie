@@ -46,29 +46,34 @@ class Console
         return game.chargen.runCommand(cmd, tokens);
 
       // try common commands first
-      var ret = runCommandCommon(cmd, tokens);
-      if (ret != 0)
+      var info = getCommandInfo(cmd, commonCommands);
+      if (info != null)
         {
-          if (ret > 0)
-            runCommandPost();
-          return ret;
-        }
-      if (game.isOver)
-        {
-          print('Game over, please start a new one.');
-          return -1;
+          var ret = runCommandCommon(info.id, tokens);
+          if (ret != 0)
+            {
+              if (ret > 0)
+                runCommandPost();
+              return ret;
+            }
+          if (game.isOver)
+            {
+              print('Game over, please start a new one.');
+              return -1;
+            }
         }
 
       // state-specific commands
       if (game.state == STATE_LOCATION)
         {
           var ret = runCommandLocation(cmd, tokens);
-          runCommandPost();
+          if (ret == 1)
+            runCommandPost();
           return ret;
         }
       else if (game.state == STATE_COMBAT)
         {
-          var info = Combat.getCommandInfo(cmd);
+          var info = getCommandInfo(cmd, Combat.commands);
           if (info == null)
             return 0;
           return game.combat.runCommand(info.id, tokens, tokensFull);
@@ -97,32 +102,32 @@ class Console
   function runCommandCommon(cmd: String, tokens: Array<String>): Int
     {
       // help
-      if (cmd == 'help' || cmd == 'h' || cmd == '?')
+      if (cmd == 'help')
         {
           if (tokens.length == 0)
             {
               var s = 
                 'Type "help &lt;command&gt;" to read command help.\n' +
-                'Commonly available commands: ' +
-                'again (g), examine (x), look at (look, l), inventory (inv, i), party/stats\n';
+                getCommandList('Commonly available commands: ',
+                  commonCommands) + '\n';
               if (game.state == STATE_LOCATION)
                 s += 'Location commands: ' +
 //                  'enter, exit, go, ' +
 //                  'roll (r), talk (t), use (u), wait (z)';
                   'wait (z)';
               else if (game.state == STATE_COMBAT)
-                s += game.combat.getCommandList();
+                s += getCommandList('Combat commands: ', Combat.commands);
               system(s);
             }
           else
             {
-              var text = commandHelp[tokens[0]];
+              var text = getCommandHelp(tokens[0], commonCommands);
               if (text == null)
                 {
                   if (game.state == STATE_LOCATION)
                     text = Location.commandHelp[tokens[0]];
                   else if (game.state == STATE_COMBAT)
-                    text = Combat.getCommandHelp(tokens[0]);
+                    text = getCommandHelp(tokens[0], Combat.commands);
                 }
               if (text != null)
                 {
@@ -131,11 +136,17 @@ class Console
                 }
               else system('There is no such command or no help available.');
             }
-          return 1;
+          return -1;
+        }
+
+      // set/print game options
+      else if (cmd == 'options')
+        {
+          return game.options.runCommand(tokens);
         }
 
       // repeat last command
-      else if (cmd == 'again' || cmd == 'g')
+      else if (cmd == 'again')
         {
           // do not store repeat itself
           _console.removeLast();
@@ -146,19 +157,19 @@ class Console
         }
 
 #if mydebug
-      else if (cmd == 'debug' || cmd == 'dbg')
+      else if (cmd == 'debug')
         return runDebugCommand(tokens);
 #end
 
       // inventory
-      else if (cmd == 'inventory' || cmd == 'inv' || cmd == 'i')
+      else if (cmd == 'inventory')
         {
           game.player.inventory.print(null);
           return -1;
         }
 
-      // party/stats
-      else if (cmd == 'party' || cmd == 'stats')
+      // party stats
+      else if (cmd == 'party')
         {
           for (ch in game.party)
             {
@@ -426,13 +437,106 @@ class Console
       _console.clear();
     }
 
+// get command info
+  public static function getCommandInfo(cmds: String,
+      list: Array<_ConsoleCommand>): _ConsoleCommand
+    {
+      // find command
+      var cmd = null;
+      for (c in list)
+        {
+          for (v in c.variants)
+            if (cmds == v)
+              {
+                cmd = c;
+                break;
+              }
+          if (cmd != null)
+            break;
+        }
+      return cmd;
+    }
 
-  static var commandHelp = [
-    'again' => 'again, g - Repeats previous command again.',
-    'examine' => 'examine, x, look, l <object> - Examines the given object.',
-    'look' => 'examine, x, look, l <object> - Examines the given object.',
-    'party' => 'party, stats - Prints party information.',
-    'stats' => 'stats, party - Prints party information.',
-    'who' => 'who <name> - Prints information about a non-player character. If the name is not given, lists known characters.',
+// get command help string
+  public static function getCommandHelp(cmds: String,
+      list: Array<_ConsoleCommand>): String
+    {
+      // find command
+      var cmd = getCommandInfo(cmds, list);
+      if (cmd == null)
+        return null;
+
+      // form string
+      var s = '';
+      for (v in cmd.variants)
+        s += v + ', ';
+      s = s.substr(0, s.length - 2) +
+        (cmd.args != null ? ' ' + cmd.args : '') +
+        ' - ' + cmd.help;
+
+      return s;
+    }
+
+// get commands list for help command
+  public function getCommandList(prefix: String, list: Array<_ConsoleCommand>): String
+    {
+      var s = prefix;
+      for (c in list)
+        {
+          for (v in 0...c.variants.length)
+            {
+              if (v == 0)
+                s += c.variants[v] + ' (';
+              else s += c.variants[v] + ', ';
+            }
+          s = s.substr(0, s.length - 2) + '), ';
+        }
+      s = s.substr(0, s.length - 2);
+      return s;
+    }
+
+  public static var commonCommands: Array<_ConsoleCommand> = [
+    {
+      id: 'again',
+      variants: [ 'again', 'g' ],
+      help: 'Repeats previous command again.',
+    },
+    {
+      id: 'examine',
+      variants: [ 'examine', 'x', 'look', 'l' ],
+      args: '<object>',
+      help: 'Examines the given object.',
+    },
+#if mydebug
+    {
+      id: 'debug',
+      variants: [ 'debug', 'dbg' ],
+      args: '<variable>',
+      help: 'Debug commands. Run to show full list.',
+    },
+#end
+    {
+      id: 'help',
+      variants: [ 'help', 'h', '?' ],
+      args: '[<command>]',
+      help: 'Shows ingame help.',
+    },
+    {
+      id: 'inventory',
+      variants: [ 'inventory', 'inv', 'i' ],
+      help: 'Shows player inventory.',
+    },
+    {
+      id: 'options',
+      variants: [ 'options', 'opts', 'opt', 'settings', 'set' ],
+      args: '[<name>] [<value>]',
+      help: 'Sets or prints game options.',
+    },
+    {
+      id: 'party',
+      variants: [ 'party', 'stats' ],
+      help: 'Prints party information.',
+    },
   ];
 }
+

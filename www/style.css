@@ -1,5 +1,8 @@
 :root {
-  --text-fg-color: #eee;
+  --text-font-size: 22px;
+  --text-font: crimson;
+  --bold-text-fg-color: #eee;
+  --text-fg-color: #e1e1e1;
 }
 
 html,
@@ -8,6 +11,8 @@ body {
 }
 
 body {
+  font-size: var(--text-font-size);
+  font-family: var(--text-font);
   background-color: #ececec;
   background:linear-gradient(#030d0f, #333333, #3a3a3c);
   color: var(--text-fg-color);
@@ -21,8 +26,6 @@ p {
 }
 
 .consoleSys {
-  font-family: monospace,monospace;
-/*  font-size: 90%;*/
   letter-spacing: 0.01em;
   color: #a9a9a9;
   line-height: 1.0;
@@ -30,6 +33,7 @@ p {
 
 .narrative {
   font-style: italic;
+  font-size: 110%;
   color: #36ed3a;
 }
 
@@ -75,7 +79,6 @@ p {
 }
 
 .extInfo {
-  font-family: monospace,monospace;
   font-size: 90%;
   letter-spacing: 0.01em;
   color: #aaa;
@@ -83,7 +86,7 @@ p {
 }
 
 .consoleDebug {
-  font-family: monospace,monospace;
+  font-family: monospace;
   font-size: 70%;
   letter-spacing: 0.01em;
   color: #777;
@@ -91,7 +94,6 @@ p {
 }
 
 .consoleError {
-  font-family: monospace,monospace;
   letter-spacing: 0.01em;
   color: #ff2222;
   font-weight: bold;
@@ -99,21 +101,16 @@ p {
 }
 
 .normal {
-  color: var(--text-fg-color);
+}
+
+strong {
+  color: var(--bold-text-fg-color);
+  font-size: 110%;
 }
 
 .console {
   position: fixed;
-/*
-  font-family: monospace,monospace;
-  font-family: 'Noto Sans', sans-serif;
-  font-family: 'Lora', serif;
-  font-size: 18px;
-*/
-  font-family: 'Cousine', monospace;
-  font-size: 16px;
   letter-spacing: 0.04em;
-  color: var(--text-fg-color);
   width: calc(100% - 3em);
   max-width: 100%;
   max-height: calc(100% - 3em);
@@ -129,13 +126,8 @@ p {
 }
 
 .console-input {
-/*
-  font-family: monospace,monospace;
-  font-family: 'Noto Sans', sans-serif;
-  font-family: 'Lora', serif;
-*/
-  font-family: 'Cousine', monospace;
-  font-size: 16px;
+  font-size: var(--text-font-size);
+  font-family: var(--text-font);
   letter-spacing: 0.04em;
   background-color: transparent;
   border: none;
@@ -209,4 +201,53 @@ p {
   color: #3df5b8;
   font-style: italic;
   opacity: 0.75;
+}
+
+@font-face {
+  font-family: 'crimson';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./data/CrimsonTextItalic.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'crimson';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url(./data/CrimsonTextItalic.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'crimson';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(./data/CrimsonTextItalic.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'crimson';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./data/CrimsonText.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'crimson';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(./data/CrimsonTextBold.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'crimson';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(./data/CrimsonTextBold.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
