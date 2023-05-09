@@ -1,14 +1,18 @@
 @:expose
 class Game
 {
-  public var chargen: Chargen;
-  public var options: Options;
+//  public var chargen: Chargen;
+//  public var options: Options;
   public var console: Console;
+  public var root: Obj;
   public var scene: Scene;
-  public var location: Location;
-  public var combat: Combat;
+//  public var location: Location;
+//  public var combat: Combat;
+  public var party: Party;
   public var player: Character;
-  public var party: Array<Character>;
+//  public var party: Array<Character>;
+  public var parserState: ParserState;
+  public var parser: Parser;
   public var extendedInfo: Bool;
   public var debug: {
     var initiative: Bool;
@@ -21,33 +25,50 @@ class Game
     {
       isOver = false;
       _state = STATE_CHARGEN;
-      location = null;
+//      location = null;
+      parser = new Parser(this);
+      parserState = parser.state;
       extendedInfo = true;
-      options = new Options(this);
-      combat = new Combat(this);
-      chargen = new Chargen(this);
+//      options = new Options(this);
+//      combat = new Combat(this);
+//      chargen = new Chargen(this);
       debug = {
         initiative: false,
       };
-      party = [];
+//      party = [];
       console = new Console(this);
-      console.print('### Welcome to Lapopie DEMO.');
-      console.print('Let\'s start with generating your character.');
-      chargen.print();
+      console.print('### Welcome to LaPopie DEMO 2.');
+//      console.print('Let\'s start with generating your character.');
+//      chargen.print();
 
       // DEBUG: auto chargen commands
-#if mydebug
+/*#if mydebug
       console.runCommand('b');
       while (@:privateAccess chargen.stats.checkMin(_TablesCleric.minStats) != '')
         console.runCommand('r');
       console.runCommand('start');
-#end
+#end*/
+      root = new Obj(null);
+      root.type = 'root';
+      root.id = 'root';
+      root.name = 'Root object';
+      @:privateAccess root.game = this;
     }
 
 // start new game (after chargen is over)
-  public function start(playerStats: Stats)
+  public function start()//playerStats: Stats)
     {
       state = STATE_LOCATION;
+      scene = new scenes.AbandonedFarmhouse(root);
+      scene.init();
+      party = new Party(root);
+      party.id = 'player';
+      party.name = 'Your party';
+      party.setAttr(CONCEALED);
+      player = new Character(party);
+      player.setAttr(CONCEALED);
+      party.addChild(player);
+/*
       // ============== DEMO SETUP ================
       // player
       player = new Character(this, CLASS_CLERIC, playerStats);
@@ -83,11 +104,12 @@ class Game
 
       // temp start
       console.printNarrative("The dusk came over the Rez forest. You and your companion were settling in for an evening by the fire near the road leading to Lapopie. But then you've heard a distant howling from somewhere in the thick woods...");
-      scene = new infos.ForestRoadDemo(this);
       console.runCommand('stats');
-      scene.enter();
-      console.print('_Note: You can only "wait" on this scene so far._');
-      console.print('<u>Hint: Use "help" command.</u>');
+*/
+      var room = scene.getChild('front');
+      party.moveTo(room);
+//      console.print('_Note: You can only "wait" on this scene so far._');
+//      console.print('<u>Hint: Use "help" command.</u>');
 
 #if mydebug
 /*
@@ -97,6 +119,8 @@ class Game
         console.runCommand('z');
 //      scene.moveTo('reflection');
 */
+      console.runCommand('open door');
+      console.runCommand('n');
 #end
     }
 
@@ -104,7 +128,7 @@ class Game
   public function turn()
     {
       // scene events tick
-      scene.turn();
+//      scene.turn();
     }
 
 // finish game
@@ -112,7 +136,7 @@ class Game
     {
       isOver = true;
       if (res == 'loseHP')
-        console.printNarrative('Bleeding from your wounds, you lose consciousness never to wake up...');
+        console.dm('Bleeding from your wounds, you lose consciousness never to wake up...');
       console.print('### GAME OVER');
     }
 
@@ -140,7 +164,8 @@ class Game
   static var inst: Game;
   static function main()
     {
-      _ItemsTables.fixWeapons();
+//      _ItemsTables.fixWeapons();
       inst = new Game();
+      inst.start();
     }
 }

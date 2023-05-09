@@ -15,32 +15,18 @@ class Console
 
 
 // run console command (called from platform-specific UI)
-// 0 - error, show standard error message
-// 1 - success
-// -1 - error, skip standard error message
-  public function runCommand(str: String): Int
+  public function runCommand(str: String)
     {
-      // split command into tokens
-      var tmp = str.split(' ');
-      var tokens = [];
-      var tokensFull = [];
-      var ignored = Const.ignoredKeywords;
-      if (game.state == STATE_COMBAT)
-        ignored = Const.ignoredCombatKeywords;
-      if (game.state == STATE_CHARGEN)
-        ignored = [];
-      for (x in tmp)
-        {
-          if (!Lambda.has(ignored, x))
-            tokens.push(x.toLowerCase());
-          tokensFull.push(x.toLowerCase());
-        }
-//      trace(tokens);
-      lastCommand = tokensFull.join(' ');
+      // parse command into tokens and action/objects
+      if (!game.parser.run(str))
+        return;
 
-      var cmd = tokens.shift();
-      tokensFull.shift();
-
+      debug('' + game.parser.state);
+      var ret = game.scene.preprocessAction();
+      if (!ret)
+        return;
+      game.scene.runAction();
+/*
       // character generation commands
       if (game.state == STATE_CHARGEN)
         return game.chargen.runCommand(cmd, tokens);
@@ -78,12 +64,8 @@ class Console
             return 0;
           return game.combat.runCommand(info.id, tokens, tokensFull);
         }
-/*
-      else if (game.state == STATE_CHAT)
-        return game.npc.runCommand(cmd, tokens, tokensFull);
 */
-
-      return 0;
+      return;
     }
 
 // post-run command, move world
@@ -101,6 +83,7 @@ class Console
 // -1 - error, skip standard error message
   function runCommandCommon(cmd: String, tokens: Array<String>): Int
     {
+/*
       // help
       if (cmd == 'help')
         {
@@ -178,43 +161,6 @@ class Console
             }
           return 1;
         }
-
-/*
-      // who
-      else if (cmd == 'who')
-        {
-          // list known characters
-          if (tokens.length < 1)
-            {
-              var s = new StringBuf();
-              s.add('Known characters: ');
-              for (ch in game.adventure.info.who)
-                if (ch.isKnown)
-                  s.add(ch.name + ', ');
-              var msg = s.toString();
-              msg = msg.substr(0, msg.length - 2);
-              print(msg);
-              return 1;
-            }
-
-          // check if char is known
-          var name = tokens[0];
-          var char = null;
-          for (ch in game.adventure.info.who)
-            if (ch.isKnown && Lambda.has(ch.names, name))
-              {
-                char = ch;
-                break;
-              }
-          if (char == null)
-            {
-              system('I have no idea who that is.');
-              return 1;
-            }
-          print(char.note);
-
-          return 1;
-        }
 */
 
       return 0;
@@ -227,6 +173,7 @@ class Console
 // -1 - error, skip standard error message
   function runCommandLocation(cmd: String, tokens: Array<String>): Int
     {
+/*
       // check for special location commands
       var ret = game.location.runSpecialCommand(lastCommand);
       if (ret == 1)
@@ -282,6 +229,7 @@ class Console
       // location-specific commands
       else return game.location.runCommand(cmd, tokens);
 
+*/
       return 0;
     }
 
@@ -293,6 +241,7 @@ class Console
 // -1 - error, skip standard error message
   function runDebugCommand(tokens: Array<String>): Int
     {
+/*
       if (tokens.length == 0)
         {
           system('Debug commands:\n' +
@@ -384,8 +333,8 @@ class Console
       _console.print(s);
     }
 
-// print narrative string
-  public inline function printNarrative(s: String)
+// print DM narrative string
+  public inline function dm(s: String)
     {
       _console.print('<span class=narrative>' + s + '</span>');
     }
@@ -413,21 +362,23 @@ class Console
 
   public inline function printFail(id: String): Bool
     {
+/*
       if (Const.stringsFail[id] != null)
         {
           print(
             Const.stringsFail[id][Std.random(
               Const.stringsFail[id].length)]);
           return true;
-        }
+        }*/
       return false;
     }
 
 
   public inline function printString(id: String)
     {
+/*
       print(
-        Const.stringsFail[id][Std.random(Const.strings[id].length)]);
+        Const.stringsFail[id][Std.random(Const.strings[id].length)]);*/
     }
 
 
@@ -437,6 +388,7 @@ class Console
       _console.clear();
     }
 
+/*
 // get command info
   public static function getCommandInfo(cmds: String,
       list: Array<_ConsoleCommand>): _ConsoleCommand
@@ -537,6 +489,6 @@ class Console
       variants: [ 'party', 'stats' ],
       help: 'Prints party information.',
     },
-  ];
+  ];*/
 }
 

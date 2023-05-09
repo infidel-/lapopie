@@ -94,12 +94,7 @@ class ConsoleJS
 
           // run command
           try {
-            var ret = game.console.runCommand(cmd);
-            if (ret == 0) // could not parse or run this command
-              {
-                print('I did not understand that.');
-                return;
-              }
+            game.console.runCommand(cmd);
             }
           catch (e: Dynamic)
             {
