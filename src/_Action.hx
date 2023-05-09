@@ -3,6 +3,7 @@
 @:enum
 abstract _Action(String) {
   var CLOSE = 'CLOSE';
+  var DROP = 'DROP';
   var GO = 'GO';
   var GODIR = 'GODIR';
   var ENTER = 'ENTER';

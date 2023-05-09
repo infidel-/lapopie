@@ -316,6 +316,7 @@ class Parser
 // form a map of name -> object for all objects around player party
   function getScope(): _Scope
     {
+      // objects in a room where the party is
       var scope = new Map();
       var o = @:privateAccess game.party.parent; 
       for (ch in @:privateAccess o.children)
@@ -324,6 +325,10 @@ class Parser
             addName(scope, name, ch);
         }
 //      trace(scope);
+      // player inventory
+      for (ch in @:privateAccess game.player.children)
+        for (name in ch.names)
+          addName(scope, name, ch);
 
       return scope;
     }

@@ -9,29 +9,6 @@ _No return value_
 **/
   public var cantGo: String;
 
-  // string versions
-  public var nTo: String;
-  public var sTo: String;
-  public var wTo: String;
-  public var eTo: String;
-  public var nwTo: String;
-  public var neTo: String;
-  public var swTo: String;
-  public var seTo: String;
-  public var uTo: String;
-  public var dTo: String;
-  // object versions
-  public var nToObj: Obj;
-  public var sToObj: Obj;
-  public var wToObj: Obj;
-  public var eToObj: Obj;
-  public var nwToObj: Obj;
-  public var neToObj: Obj;
-  public var swToObj: Obj;
-  public var seToObj: Obj;
-  public var uToObj: Obj;
-  public var dToObj: Obj;
-
   public function new(parent: Obj)
     {
       super(parent);
@@ -61,6 +38,7 @@ _No return value_
   function descRoom(forceFull: Bool)
     {
       var s = '**' + name + '**\n';
+      // mark room as visited on first "look"
       if (!hasAttr(VISITED))
         {
           s += desc;
@@ -70,7 +48,19 @@ _No return value_
         s += desc;
       for (ch in children)
         if (!ch.hasAttr(CONCEALED))
-          s += '\n' + ch.describeF();
+          {
+            // initial description
+            if (!ch.hasAttr(MOVED))
+              {
+                var tmp = ch.initialF();
+                if (tmp != null && tmp != '')
+                  s += '\n' + tmp;
+                else if (ch.initial != null &&
+                    ch.initial != '')
+                  s += '\n' + ch.initial;
+              }
+            else s += '\n' + ch.describeF();
+          }
       return s;
     }
 
@@ -83,4 +73,33 @@ _No return value_
         stringToObject(f);
     }
   static var dirFields = [ 'nTo', 'sTo', 'wTo', 'eTo', 'nwTo', 'neTo', 'swTo', 'seTo', 'uTo', 'dTo' ];
+
+/**
+_Room, object or routine_
+_For rooms_   These twelve properties (there are also `ne_to`, `nw_to`, `se_to`, `sw_to`, `in_to`, `out_to`, `u_to` and `d_to`) are the map connections for the room. A value of 0 means “can't go this way”. Otherwise, the value should either be a room or a `door` object: thus, `e_to` might be set to `crystal_bridge` if the direction “east” means “over the crystal bridge”.  
+_Routine returns_   The room or object the map connects to; or 0 for “can't go this way”; or 1 for “can't go this way; stop and print nothing further”.  
+_Warning_   Do not confuse the direction properties `n_to` and so on with the twelve direction objects, `n_obj` et al.
+**/
+  // string versions
+  public var nTo: String;
+  public var sTo: String;
+  public var wTo: String;
+  public var eTo: String;
+  public var nwTo: String;
+  public var neTo: String;
+  public var swTo: String;
+  public var seTo: String;
+  public var uTo: String;
+  public var dTo: String;
+  // object versions
+  public var nToObj: Obj;
+  public var sToObj: Obj;
+  public var wToObj: Obj;
+  public var eToObj: Obj;
+  public var nwToObj: Obj;
+  public var neToObj: Obj;
+  public var swToObj: Obj;
+  public var seToObj: Obj;
+  public var uToObj: Obj;
+  public var dToObj: Obj;
 }

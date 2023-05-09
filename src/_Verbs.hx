@@ -39,6 +39,25 @@ Verb 'close' 'cover' 'shut'
       ],
     },
 /**
+Verb 'drop' 'discard'
+    * multiexcept 'in'/'into'/'down' noun -> Insert
+    * multiexcept 'on'/'onto' noun -> PutOn;
+**/
+    // drop X
+    {
+      action: DROP,
+      tokens: [
+        {
+          type: WORD_ANY,
+          words: [ 'drop', 'discard' ],
+        },
+        // TODO: multiheld
+        {
+          type: NOUN,
+        },
+      ],
+    },
+/**
 Verb 'get'
     * 'out'/'off'/'up' 'of'/'from' noun -> Exit
     * 'in'/'into'/'on'/'onto' noun -> Enter
@@ -189,6 +208,36 @@ Verb 'look' 'l//'
         {
           type: WORD,
           word: 'with',
+        },
+        {
+          type: NOUN,
+        },
+      ],
+    },
+    // peel X
+    {
+      action: TAKE,
+      tokens: [
+        {
+          type: WORD,
+          word: 'peel',
+        },
+        {
+          type: NOUN,
+        },
+      ],
+    },
+    // peel off X
+    {
+      action: TAKE,
+      tokens: [
+        {
+          type: WORD,
+          word: 'peel',
+        },
+        {
+          type: WORD,
+          word: 'off',
         },
         {
           type: NOUN,

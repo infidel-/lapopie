@@ -33,6 +33,11 @@ abstract _Attribute(String) {
 // if a container and also locked, may be called ''locked'' in inventories.
   var LOCKABLE = 'LOCKABLE';
 
+// ''Has been or is being held by the player.'' Objects (immediately) owned by the player after Initialise has run are given it;
+// at the end of each turn, if an item is newly held by the player and is scored, it is given moved and OBJECT_SCORE points are awarded;
+// an object's initial message only appears in room descriptions if it is unmoved.
+  var MOVED = 'MOVED';
+
 // Can be opened or closed, unless locked.
   var OPENABLE = 'OPENABLE';
 

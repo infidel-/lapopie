@@ -121,6 +121,17 @@ describe "There are holes in the soft dirt near your feet.",
 // runs before every command
 // returns true on success and continues
 // stops working on false
+/**
+_Routine_   `NULL`   (+)
+Receives advance warning of actions (or fake actions) about to happen.  
+_For rooms_   All actions taking place in this room.  
+_For objects_   All actions for which this object is `noun` (the first object specified in the command); and all fake actions, such as `Receive` and `LetGo` if this object is the container or supporter concerned.  
+_Routine returns_   `false` to continue with the action, `true` to stop here (printing nothing).
+
+First special case: A vehicle object receives the `Go` action if the player is trying to drive around in it. In this case:  
+_Routine returns_   0 to disallow as usual; 1 to allow as usual, moving vehicle and player; 2 to disallow but do (and print) nothing; 3 to allow but do (and print) nothing. If you want to move the vehicle in your own code, return 3, not 2: otherwise the old location may be restored by subsequent workings.  
+Second special case: in a `PushDir` action, the `before` routine must call `AllowPushDir()` and then return `true` in order to allow the attempt (to push an object from one room to another) to succeed.
+**/
   public function before(): Bool
     {
       if (first != null && first != this)
@@ -136,6 +147,12 @@ describe "There are holes in the soft dirt near your feet.",
             if (!hasAttr(OPEN))
               {
                 p("That's already closed.");
+                return false;
+              }
+          case DROP:
+            if (parent != actor)
+              {
+                p("That is already here.");
                 return false;
               }
           case OPEN:
@@ -155,6 +172,11 @@ describe "There are holes in the soft dirt near your feet.",
                 return false;
               }
           case TAKE:
+            if (parent == actor)
+              {
+                p("You already have that.");
+                return false;
+              }
             if (hasAttr(STATIC))
               {
                 p("That's fixed in place.");
@@ -171,24 +193,36 @@ describe "There are holes in the soft dirt near your feet.",
 //      debug('obj.during');
       switch (action)
         {
-          case OPEN:
-            setAttr(OPEN);
           case CLOSE:
             unsetAttr(OPEN);
+          case DROP:
+            moveTo(actor.getRoom());
+          case OPEN:
+            setAttr(OPEN);
           case TAKE:
             moveTo(actor);
+            if (!hasAttr(MOVED))
+              setAttr(MOVED);
           default:
         }
     }
 
-// runs after every command
-// returns string to print
+/**
+_Routine_   `NULL`   (+)
+Receives actions after they have happened, but before the player has been told of them.  
+_For rooms_   All actions taking place in this room.  
+_For objects_   All actions for which this object is `noun` (the first object specified in the command); and all fake actions for it.  
+_Routine returns_   `false` to continue (and tell the player what has happened), `true` to stop here (printing nothing).  
+The `Search` action is a slightly special case. Here, `after` is called when it is clear that it would be sensible to look inside the object (e.g., it's an open container in a light room) but before the contents are described.
+**/
   public function after(): String
     {
       switch (action)
         {
           case CLOSE:
             return "You close " + theName + ".";
+          case DROP:
+            return 'Dropped.';
           case EXAMINE:
             return desc;
           case OPEN:
