@@ -4,8 +4,8 @@ class Obj
 {
   var game: Game;
   var scene: Scene;
-  var parent: Obj;
-  var children: Array<Obj>;
+  public var parent(default, null): Obj;
+  public var children(default, null): Array<Obj>;
   var state(get, null): ParserState;
   var action(get, null): _Action;
   var actor(get, null): Obj;
@@ -225,6 +225,15 @@ The `Search` action is a slightly special case. Here, `after` is called when
             return 'Dropped.';
           case EXAMINE:
             return desc;
+          case INVENTORY:
+            if (actor.children.length == 0)
+              return "You are carrying nothing.";
+            var s = 'You are carrying ';
+            var tmp = [];
+            for (ch in actor.children)
+              tmp.push(ch.aName);
+            s += tmp.join(', ') + '.';
+            return s;
           case OPEN:
             if (hasAttr(CONTAINER))
               return "You open " + theName + ", revealing " + stringChildren();

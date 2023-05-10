@@ -318,15 +318,15 @@ class Parser
     {
       // objects in a room where the party is
       var scope = new Map();
-      var o = @:privateAccess game.party.parent; 
-      for (ch in @:privateAccess o.children)
+      var o = game.party.parent; 
+      for (ch in o.children)
         {
           for (name in ch.names)
             addName(scope, name, ch);
         }
 //      trace(scope);
       // player inventory
-      for (ch in @:privateAccess game.player.children)
+      for (ch in game.player.children)
         for (name in ch.names)
           addName(scope, name, ch);
 

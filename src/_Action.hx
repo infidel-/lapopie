@@ -8,6 +8,7 @@ abstract _Action(String) {
   var GODIR = 'GODIR';
   var ENTER = 'ENTER';
   var EXAMINE = 'EXAMINE';
+  var INVENTORY = 'INVENTORY';
   var LOOK = 'LOOK';
   var OPEN = 'OPEN';
   var TAKE = 'TAKE';

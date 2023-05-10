@@ -145,6 +145,21 @@ Verb 'enter' 'cross'
         },
       ],
     },
+/**
+Verb 'inventory' 'inv' 'i//'
+    * 'tall' -> InvTall
+    * 'wide' -> InvWide;
+**/
+    // inventory
+    {
+      action: INVENTORY,
+      tokens: [
+        {
+          type: WORD_ANY,
+          words: [ 'inventory', 'inv', 'i' ],
+        },
+      ],
+    },
 /*
 look
 Verb 'look' 'l//'
