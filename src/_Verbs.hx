@@ -13,7 +13,7 @@ Verb 'close' 'cover' 'shut'
       action: CLOSE,
       tokens: [
         {
-          type: WORD_ANY,
+          type: WORDS,
           words: [ 'close', 'cover', 'shut' ],
         },
         {
@@ -26,7 +26,7 @@ Verb 'close' 'cover' 'shut'
       action: CLOSE,
       tokens: [
         {
-          type: WORD_ANY,
+          type: WORDS,
           words: [ 'close', 'cover', 'shut' ],
         },
         {
@@ -48,7 +48,7 @@ Verb 'drop' 'discard'
       action: DROP,
       tokens: [
         {
-          type: WORD_ANY,
+          type: WORDS,
           words: [ 'drop', 'discard' ],
         },
         // TODO: multiheld
@@ -69,8 +69,8 @@ Verb 'get'
       action: TAKE,
       tokens: [
         {
-          type: WORD,
-          word: 'get',
+          type: WORDS,
+          words: [ 'get', 'grab' ],
         },
         // TODO: multi
         {
@@ -94,11 +94,11 @@ Verb 'enter' 'cross'
       action: GO,
       tokens: [
         {
-          type: WORD_ANY,
+          type: WORDS,
           words: [ 'go', 'run', 'walk' ],
         },
         {
-          type: WORD_ANY,
+          type: WORDS,
           words: [ 'into', 'in', 'inside', 'through' ],
         },
         {
@@ -111,7 +111,7 @@ Verb 'enter' 'cross'
       action: GODIR,
       tokens: [
         {
-          type: WORD_ANY,
+          type: WORDS,
           words: [ 'go', 'run', 'walk' ],
         },
         {
@@ -124,7 +124,7 @@ Verb 'enter' 'cross'
       action: ENTER,
       tokens: [
         {
-          type: WORD_ANY,
+          type: WORDS,
           words: [ 'enter', 'cross', 'go', 'run', 'walk' ],
         },
         {
@@ -137,7 +137,7 @@ Verb 'enter' 'cross'
       action: EXAMINE,
       tokens: [
         {
-          type: WORD_ANY,
+          type: WORDS,
           words: [ 'examine', 'x', 'check', 'describe', 'watch' ],
         },
         {
@@ -155,7 +155,7 @@ Verb 'inventory' 'inv' 'i//'
       action: INVENTORY,
       tokens: [
         {
-          type: WORD_ANY,
+          type: WORDS,
           words: [ 'inventory', 'inv', 'i' ],
         },
       ],
@@ -163,7 +163,6 @@ Verb 'inventory' 'inv' 'i//'
 /*
 look
 Verb 'look' 'l//'
-    * 'inside'/'in'/'into'/'through'/'on' noun  -> Search
     * 'under' noun          -> LookUnder
     * 'up' topic 'in' noun  -> Consult
     * noun=ADirection       -> Examine
@@ -174,7 +173,7 @@ Verb 'look' 'l//'
       action: LOOK,
       tokens: [
         {
-          type: WORD_ANY,
+          type: WORDS,
           words: [ 'look', 'l' ],
         },
       ],
@@ -184,7 +183,7 @@ Verb 'look' 'l//'
       action: EXAMINE,
       tokens: [
         {
-          type: WORD_ANY,
+          type: WORDS,
           words: [ 'look', 'l' ],
         },
         {
@@ -196,12 +195,29 @@ Verb 'look' 'l//'
         },
       ],
     },
+    // look into X
+    {
+      action: SEARCH,
+      tokens: [
+        {
+          type: WORDS,
+          words: [ 'look', 'l' ],
+        },
+        {
+          type: WORDS,
+          words: [ 'inside', 'in', 'into', 'through', 'on' ],
+        },
+        {
+          type: NOUN,
+        },
+      ],
+    },
     // open X
     {
       action: OPEN,
       tokens: [
         {
-          type: WORD_ANY,
+          type: WORDS,
           words: [ 'open', 'uncover', 'undo', 'unwrap' ],
         },
         {
@@ -214,7 +230,7 @@ Verb 'look' 'l//'
       action: UNLOCK,
       tokens: [
         {
-          type: WORD_ANY,
+          type: WORDS,
           words: [ 'open', 'uncover', 'undo', 'unwrap' ],
         },
         {
@@ -292,6 +308,48 @@ Verb 'look' 'l//'
         {
           type: WORD,
           word: 'up',
+        },
+      ],
+    },
+/**
+Verb 'put'
+    * multiexcept 'in'/'inside'/'into' noun -> Insert
+    * multiexcept 'on'/'onto' noun -> PutOn
+    * 'on' multiheld -> Wear
+**/
+    // put down X
+    {
+      action: DROP, 
+      tokens: [
+        {
+          type: WORD,
+          word: 'put',
+        },
+        {
+          type: WORD,
+          word: 'down',
+        },
+        // TODO: multiheld
+        {
+          type: NOUN,
+        },
+      ],
+    },
+    // put X down
+    {
+      action: DROP,
+      tokens: [
+        {
+          type: WORD,
+          word: 'put',
+        },
+        // TODO: multiheld
+        {
+          type: NOUN,
+        },
+        {
+          type: WORD,
+          word: 'down',
         },
       ],
     },

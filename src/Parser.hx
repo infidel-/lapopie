@@ -40,7 +40,7 @@ class Parser
       for (info in _Verbs.infos)
         {
           var token = info.tokens[0];
-          if (token.type == WORD_ANY)
+          if (token.type == WORDS)
             for (w in token.words)
               addVerb(w, info);
           else if (token.type == WORD)
@@ -89,9 +89,9 @@ class Parser
             });
           // check for scoped nouns
           else if (scope[w] != null)
-            {/*
-              // could be a dir too (south door)
-              if (dirs[w] != null)
+            {
+              // could be a noun too (south door)
+              /*if (dirs[w] != null)
                 state.tokens.push({
                   type: NOUNORDIR,
                   word: w,
@@ -103,10 +103,14 @@ class Parser
             }
           // check for directions
           else if (dirs[w] != null)
-            state.tokens.push({
-              type: DIRECTION,
-              dir: dirs[w],
-            });
+            {
+              // could be a word too (pick up rock)
+              state.tokens.push({
+                type: WORDORDIR,
+                word: w,
+                dir: dirs[w],
+              });
+            }
           // for now just make a word out of it
           else state.tokens.push({
             type: WORD,
@@ -114,18 +118,23 @@ class Parser
           });
         }
 
-      // special case - direction
-      if (state.tokens.length == 1 &&
-          state.tokens[0].type == DIRECTION)
+      // special case - just direction
+      if (state.tokens.length == 1)
         {
-          state.action = GODIR;
-          state.dir = state.tokens[0].dir;
-          return true; 
+          var t = state.tokens[0];
+          if (t.type == DIRECTION ||
+              t.type == WORDORDIR)
+            {
+              state.action = GODIR;
+              state.dir = t.dir;
+              return true; 
+            }
         }
 
       // first token must be a verb (for now?)
       if (state.tokens[0].type != VERB)
         {
+          game.console.debug('' + state.tokens);
           error('Commands must start with a verb.');
           return false;
         }
@@ -150,7 +159,8 @@ class Parser
               var stoken = state.tokens[i];
               if (itoken.type == WORD)
                 {
-                  if (stoken.type != WORD &&
+                  if (stoken.type != WORDORDIR &&
+                      stoken.type != WORD &&
                       stoken.type != VERB)
                     {
                       ok = false;
@@ -162,7 +172,7 @@ class Parser
                       break;
                     }
                 }
-              else if (itoken.type == WORD_ANY)
+              else if (itoken.type == WORDS)
                 {
                   if (stoken.type != WORD &&
                       stoken.type != VERB)
@@ -178,6 +188,14 @@ class Parser
                 }
               else if (itoken.type == NOUN)
                 {
+/*
+                  if (stoken.type == NOUNORDIR)
+                    {
+                      stoken.type = OBJECT;
+                      // hack: grab first one
+                      stoken.obj = scope[stoken.word].first();
+                      stoken.word = null;
+                    }*/
                   if (stoken.type != OBJECT)
                     {
                       ok = false;
@@ -186,7 +204,8 @@ class Parser
                 }
               else if (itoken.type == DIRECTION)
                 {
-                  if (stoken.type != DIRECTION)
+                  if (stoken.type != DIRECTION &&
+                      stoken.type != WORDORDIR)
                     {
                       ok = false;
                       break;
@@ -363,7 +382,8 @@ enum _TokenType {
   DIRECTION;
   NOUN;
   WORD;
-  WORD_ANY;
+  WORDORDIR;
+  WORDS;
   // after parsing
   OBJECT;
   VERB;

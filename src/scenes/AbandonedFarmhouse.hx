@@ -140,7 +140,7 @@ class ClayMug extends Item
       super(parent);
       id = 'clayMug';
       name = 'clay mug';
-      names = [ 'clay', 'mug', 'tankard', 'cup' ];
+      names = [ 'old', 'aged', 'weathered', 'clay', 'mug', 'tankard', 'cup' ];
       desc = 'An aged clay mug bears the scars of time with its faded colors and intricate web of cracks.';
       initial = 'An old, weathered clay mug lies forgotten on the dusty floor.';
 // #TODO: when thrown, shatters (make a new attribute, FRAGILE - also use it for potions, for example)
