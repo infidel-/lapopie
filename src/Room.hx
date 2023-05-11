@@ -35,7 +35,7 @@ _No return value_
     }
 
 // room description, full or brief
-  function descRoom(forceFull: Bool)
+  public function descRoom(forceFull: Bool)
     {
       var s = '**' + name + '**\n';
       // mark room as visited on first "look"

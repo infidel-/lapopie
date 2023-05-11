@@ -353,6 +353,33 @@ Verb 'put'
         },
       ],
     },
+    // rub X
+    {
+      action: RUB,
+      tokens: [
+        {
+          type: WORDS,
+          words: [ 'rub', 'clean', 'dust', 'polish', 'scrub', 'shine', 'sweep', 'wipe' ],
+        },
+        {
+          type: NOUN,
+        },
+      ],
+    },
+    // search X
+    {
+      action: SEARCH,
+      tokens: [
+        {
+          type: WORD,
+          word: 'search',
+        },
+        {
+          type: NOUN,
+        },
+      ],
+    },
+
 /**
 Verb 'take'
     * 'off' multiheld -> Disrobe

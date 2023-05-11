@@ -1,10 +1,6 @@
 // abandoned farmhouse scene
 package scenes;
 
-/*
-   class World
-*/
-
 class AbandonedFarmhouse extends Scene
 {
   public function new(parent: Obj)
@@ -12,8 +8,10 @@ class AbandonedFarmhouse extends Scene
       super(parent);
       id = 'abandonedFarmhouse';
       name = 'Abandoned Farmhouse Scene';
+      dm = "You see a bleak, abandoned farmhouse by the forest road, its forlorn visage revealing years of decay. Aged walls stand firm, as a decaying chimney and untamed garden exude a somber mood. Yet, despite its desolation, the farmhouse hold an odd allure, beckoning you with the promise of forgotten secrets and hidden treasures within.";
       addChild(new Front(this));
       addChild(new LivingArea(this));
+      addChild(new Kitchen(this));
     }
 }
 
@@ -24,9 +22,8 @@ class Front extends Room
       super(parent);
       id = 'front';
       name = 'Abandoned Farmhouse (front)';
-// #TODO: temp
-      desc = 'It stands like a forgotten sentinel beside the forest road, its roof sagging with age and its walls streaked with moss and rust. The front door to the north is old but sturdy, and darkened windows peer out like empty sockets on either side. Yet, despite its desolation, the farmhouse seems to hold a strange allure, beckoning you with the promise of forgotten secrets and hidden treasures within.';
-// #TODO: scenery
+     desc = 'It stands like a forgotten sentinel beside the forest road, its roof sagging with age and its walls streaked with moss and rust. The front door to the north is old but sturdy, and darkened windows peer out like empty sockets on either side.';
+// #TODO: scenery - garden, bushes, chimney
       addChild(new FrontDoor(this));
       addChild(new LeftWindow(this));
       addChild(new RightWindow(this));
@@ -54,7 +51,7 @@ private class LeftWindow extends Obj
       switch (state.action)
         {
           case SEARCH:
-            p('Looking through the window, you see what appears to be a bedroom. #TODO');
+            p('#TODO');
           default:
             return super.before();
         }
@@ -62,30 +59,69 @@ private class LeftWindow extends Obj
     }
 }
 
-private class RightWindow extends Obj
+private class RightWindow extends Door
 {
+  var dusty: Bool;
   public function new(parent: Obj)
     {
       super(parent);
       id = 'rightWindow';
       name = 'right window';
       names = [ 'right', 'window' ];
-      desc = 'The window is covered with a thick layer of dirt.';
-// TODO: dust and wiping the dust
+      dusty = true;
 // TODO: foundIn = [ 'kitchen' ]
+// TODO: climb, open, unlock, break
+// TODO: sound
+// TODO: clean dirt
       setAttr(CONCEALED);
+    }
+
+  override function descF()
+    {
+      var s = 'This window is large enough to climb into. ';
+      if (dusty)
+        s += 'It is covered with a thick layer of dirt.';
+      else s += 'You have wiped the dirt away from the window.';
+      return s;
     }
 
   public override function before()
     {
       switch (state.action)
         {
+          case RUB:
+            if (!dusty)
+              {
+                p("You've already cleaned the dirt off.");
+                return false;
+              }
           case SEARCH:
-            p('Looking through the window, you see what appears to be a kitchen. #TODO');
+            if (dusty)
+              {
+                p('The window has too much dirt on it to see inside.');
+                return false;
+              }
           default:
             return super.before();
         }
       return true;
+    }
+
+  public override function after(): String
+    {
+      switch (state.action)
+        {
+          case RUB:
+            dusty = false;
+            return "You wipe the dirt off the right window.";
+          case SEARCH:
+            var kitchen = scene.findObject('kitchen').asRoom();
+            var s = 'You peer through the window:\n';
+            s += kitchen.descRoom(true);
+            return s;
+          default:
+            return super.after();
+        }
     }
 }
 
@@ -116,7 +152,7 @@ private class FrontDoor extends Door
     }
 }
 
-class LivingArea extends Room
+private class LivingArea extends Room
 {
   public function new(parent: Obj)
     {
@@ -133,7 +169,7 @@ class LivingArea extends Room
     }
 }
 
-class ClayMug extends Item
+private class ClayMug extends Item
 {
   public function new(parent: Obj)
     {
@@ -144,5 +180,37 @@ class ClayMug extends Item
       desc = 'An aged clay mug bears the scars of time with its faded colors and intricate web of cracks.';
       initial = 'An old, weathered clay mug lies forgotten on the dusty floor.';
 // #TODO: when thrown, shatters (make a new attribute, FRAGILE - also use it for potions, for example)
+    }
+}
+
+private class Kitchen extends Room
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = 'kitchen';
+      name = 'Kitchen';
+      desc = "In the forsaken kitchen, filth and rubble litter the space. A gaping trapdoor beckons from the northeast ceiling corner, while a passage with a tattered door leads north, and another door heads west. A grimy cauldron sits in the fireplace, a skeletal hand protruding ominously from it.";
+
+      addChild(new Barrel(this));
+/** TODO
+The door to the west is slightly ajar, and there is a bucket perched precariously on top of it.
+
+A heap of garments and a ripped backpack lie abandoned on the floor.
+
+The cauldron brims with an assortment of bones, raising the chilling question: are they human?
+**/
+    }
+}
+
+private class Barrel extends Obj
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = 'barrel';
+      name = 'old barrel';
+      names = [ 'old', 'barrel' ];
+      initial = 'An ancient barrel rests near the fireplace.';
     }
 }

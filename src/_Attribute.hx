@@ -52,5 +52,6 @@ abstract _Attribute(String) {
   var STATIC = 'STATIC';
 
 // ''Has been or is being visited by the player.'' Given to a room immediately after a Look first happens there: if this room is scored then ROOM_SCORE points are awarded. Affects whether room descriptions are abbreviated or not.
+// given to scenes on entry to any room in it
   var VISITED = 'VISITED';
 }

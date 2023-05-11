@@ -25,13 +25,6 @@ class Obj
 // linked object in another location
 // for example, other side of the same door
   public var linkedObj: Obj;
-/**
-_String or routine_
-_For objects_   The `Examine` message, or a routine to print one out.  
-_For rooms_   The long (“look”) description, or a routine to print one out.  
-_No return value
-**/
-  public var desc: String;
 
   public function new(parent: Obj)
     {
@@ -66,6 +59,18 @@ initial "A handwritten envelope, recently delivered, is lying on the table.",
   function initialF(): String
     {
       return '';
+    }
+
+/**
+_String or routine_
+_For objects_   The `Examine` message, or a routine to print one out.  
+_For rooms_   The long (“look”) description, or a routine to print one out.  
+_No return value
+**/
+  public var desc: String;
+  function descF(): String
+    {
+      return desc;
     }
 
 /**
@@ -224,7 +229,7 @@ The `Search` action is a slightly special case. Here, `after` is called when
           case DROP:
             return 'Dropped.';
           case EXAMINE:
-            return desc;
+            return descF();
           case INVENTORY:
             if (actor.children.length == 0)
               return "You are carrying nothing.";
@@ -238,6 +243,8 @@ The `Search` action is a slightly special case. Here, `after` is called when
             if (hasAttr(CONTAINER))
               return "You open " + theName + ", revealing " + stringChildren();
             else return "You open " + theName + ".";
+          case RUB:
+            return "You achieve nothing by this.";
           case TAKE:
             return 'Taken.';
           default:
@@ -249,9 +256,19 @@ The `Search` action is a slightly special case. Here, `after` is called when
 // move this object to another parent
   public function moveTo(target: Obj)
     {
+      // first entry - dm narration
+      var callEnter = false;
+      if (this == game.party)
+        {
+          if (game.party.scene != target.scene)
+            callEnter = true;
+        }
       parent.children.remove(this);
       target.children.push(this);
       parent = target;
+      scene = target.scene;
+      if (callEnter)
+        scene.enter();
 
       // moving player party will run description
       if (this == game.party)
@@ -301,6 +318,20 @@ The `Search` action is a slightly special case. Here, `after` is called when
         if (ch.id == id)
           return ch;
       return null;
+    }
+
+// get scene through parent
+  public function getScene(): Scene
+    {
+      var p = this.parent;
+      while (p != null && p.type != 'scene')
+        p = p.parent;
+      if (p == null)
+        {
+//          error('Not in scene.');
+          return null;
+        }
+      return p.asScene();
     }
 
 // get room through parent
@@ -478,9 +509,14 @@ The `Search` action is a slightly special case. Here, `after` is called when
       game.console.error(toString() + ': ' + s);
     }
 
+// casters
   public inline function asRoom(): Room
     {
       return cast(this, Room);
+    }
+  public inline function asScene(): Scene
+    {
+      return cast(this, Scene);
     }
 
   public function toString(): String

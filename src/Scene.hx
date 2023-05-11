@@ -4,12 +4,27 @@ class Scene extends Obj
 // filled during init() to auto-make other sides
 // cleaned afterwards
   public var initDoors: Array<Door>;
+// dm string, printed on first entry to scene
+  public var dm: String;
 
   public function new(parent: Obj)
     {
       super(parent);
       type = 'scene';
       initDoors = [];
+    }
+
+// called when player enters scene
+  public function enter()
+    {
+      // first entry
+      if (!hasAttr(VISITED))
+        {
+          setAttr(VISITED);
+          if (dm != null && dm != '')
+            game.console.dm(dm);
+        }
+      // any entry
     }
 
 // fix all string links into object links
@@ -22,6 +37,8 @@ class Scene extends Obj
       // create a double for each door on the other side
       for (door in initDoors)
         {
+          if (door.doorDir == null || door.doorTo == null)
+            continue;
           var doorClass = Type.getClass(door);
           var door2 = Type.createInstance(doorClass, [ door.doorToObj ]);
 // may be tricky

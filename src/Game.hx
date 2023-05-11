@@ -103,7 +103,6 @@ class Game
       party.push(jean);
 
       // temp start
-      console.printNarrative("The dusk came over the Rez forest. You and your companion were settling in for an evening by the fire near the road leading to Lapopie. But then you've heard a distant howling from somewhere in the thick woods...");
       console.runCommand('stats');
 */
       var room = scene.getChild('front');
@@ -120,7 +119,7 @@ class Game
 //      scene.moveTo('reflection');
 */
       console.runCommand('open door');
-      console.runCommand('n');
+//      console.runCommand('n');
 #end
     }
 
