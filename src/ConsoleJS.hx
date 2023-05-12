@@ -98,9 +98,9 @@ class ConsoleJS
             }
           catch (e: Dynamic)
             {
-              print('**Exception: ' + 
-                haxe.CallStack.toString(haxe.CallStack.exceptionStack()) +
-                '**');
+              print('Exception: ' + 
+                haxe.CallStack.toString(haxe.CallStack.exceptionStack()));
+              throw e; // rethrow to get better stack
             }
         }
     }

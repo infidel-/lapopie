@@ -12,7 +12,25 @@ _No return value_
   public function new(parent: Obj)
     {
       super(parent);
-      this.type = 'room';
+      type = 'room';
+      dirObj = new Map();
+    }
+
+  override function during()
+    {
+      switch (action)
+        {
+          case GODIR:
+            var obj = dirObj[dir];
+            if (obj == null)
+              {
+                debug('CANTGO ERROR');
+                return;
+              }
+            game.party.moveTo(obj);
+          default:
+            super.during();
+        }
     }
 
 // room actions
@@ -23,6 +41,8 @@ _No return value_
           // room description
           case LOOK:
             return descRoom(true);
+          case GODIR:
+            return '';
           default:
             return super.after();
         }
@@ -69,10 +89,10 @@ _No return value_
       super.init();
 
       // find all direction objects for quicker access
-      for (f in dirFields)
-        stringToObject(f);
+      for (f in Const.compassDirectionProps.keys())
+        dirObj[Const.compassDirectionProps[f]] =
+          stringToObject(f + 'To');
     }
-  static var dirFields = [ 'nTo', 'sTo', 'wTo', 'eTo', 'nwTo', 'neTo', 'swTo', 'seTo', 'uTo', 'dTo' ];
 
 /**
 _Room, object or routine_
@@ -102,4 +122,6 @@ _Warning_   Do not confuse the direction properties `n_to` and so on with th
   public var seToObj: Obj;
   public var uToObj: Obj;
   public var dToObj: Obj;
+  // map
+  public var dirObj: Map<_CompassDirection, Obj>;
 }

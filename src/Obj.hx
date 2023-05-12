@@ -44,6 +44,13 @@ class Obj
       attrs = [ STATIC ];
     }
 
+/**
+_String or routine_   `"a"`
+_For objects_   Indefinite article for object or routine to print one.  
+_No return value_
+**/
+  public var article: String;
+
 /*
 String or routine_
 _For objects_   The description of an object not yet picked up, used when a room is described; or a routine to print one out.  
@@ -160,6 +167,12 @@ Second special case: in a `PushDir` action, the `before` routine must call 
                 p("That is already here.");
                 return false;
               }
+          case EAT:
+            if (!hasAttr(EDIBLE))
+              {
+                p("That's plainly inedible.");
+                return false;
+              }
           case OPEN:
             if (!hasAttr(OPENABLE))
               {
@@ -202,6 +215,8 @@ Second special case: in a `PushDir` action, the `before` routine must call 
             unsetAttr(OPEN);
           case DROP:
             moveTo(actor.getRoom());
+          case EAT:
+            destroy();
           case OPEN:
             setAttr(OPEN);
           case TAKE:
@@ -228,17 +243,15 @@ The `Search` action is a slightly special case. Here, `after` is called when
             return "You close " + theName + ".";
           case DROP:
             return 'Dropped.';
+          case EAT:
+            return 'You eat ' + theName + '. Not bad.';
           case EXAMINE:
             return descF();
           case INVENTORY:
             if (actor.children.length == 0)
               return "You are carrying nothing.";
-            var s = 'You are carrying ';
-            var tmp = [];
-            for (ch in actor.children)
-              tmp.push(ch.aName);
-            s += tmp.join(', ') + '.';
-            return s;
+            return 'You are carrying ' +
+              actor.stringChildren() + '.';
           case OPEN:
             if (hasAttr(CONTAINER))
               return "You open " + theName + ", revealing " + stringChildren();
@@ -368,10 +381,20 @@ The `Search` action is a slightly special case. Here, `after` is called when
 // get a string with list of children
   public function stringChildren(): String
     {
-      var tmp = [];
-      for (ch in children)
-        tmp.push(ch.aName);
-      return tmp.join(', ');
+      var s = '';
+      for (i in 0...children.length)
+        {
+          var ch = children[i];
+          s += ch.aName;
+          if (children.length == 1)
+            continue;
+
+          if (i == children.length - 2)
+            s += ' and ';
+          else if (i != children.length - 1)
+            s += ', ';
+        }
+      return s;
     }
 
 // returns true if this object has this attribute
@@ -428,15 +451,23 @@ The `Search` action is a slightly special case. Here, `after` is called when
     }
 
 // convert string field to object and set it
-  public function stringToObject(f: String)
+  public function stringToObject(f: String): Obj
     {
       var id:String = Reflect.field(this, f);
       if (id == null || id == '')
-        return; 
+        return null;
       var val = scene.findObject(id);
       if (val == null)
         error('Could not find object ' + id + ' in this scene.');
       Reflect.setField(this, f + 'Obj', val);
+      return val;
+    }
+
+// destroys the object
+  public function destroy()
+    {
+      parent.children.remove(this);
+      parent = null;
     }
 
 // print string
@@ -466,7 +497,7 @@ The `Search` action is a slightly special case. Here, `after` is called when
 // get name with 'a' article
   function get_aName()
     {
-      return 'a ' + name;
+      return (article != null ? article : 'a') + ' ' + name;
     }
 
   function get_action()

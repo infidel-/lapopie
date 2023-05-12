@@ -3,6 +3,8 @@ import Parser;
 
 class _Verbs
 {
+  public static var debugInfos: Array<_VerbInfo> = [
+  ];
   public static var infos: Array<_VerbInfo> = [
 /**
 Verb 'close' 'cover' 'shut'
@@ -38,6 +40,22 @@ Verb 'close' 'cover' 'shut'
         },
       ],
     },
+    // debug X Y
+    {
+      action: DEBUG,
+      tokens: [
+        {
+          type: WORDS,
+          words: [ 'debug', 'dbg', 'd' ],
+        },
+        {
+          type: WORDANY,
+        },
+        {
+          type: WORDANY,
+        },
+      ],
+    },
 /**
 Verb 'drop' 'discard'
     * multiexcept 'in'/'into'/'down' noun -> Insert
@@ -52,6 +70,19 @@ Verb 'drop' 'discard'
           words: [ 'drop', 'discard' ],
         },
         // TODO: multiheld
+        {
+          type: NOUN,
+        },
+      ],
+    },
+    // eat X
+    {
+      action: EAT,
+      tokens: [
+        {
+          type: WORDS,
+          words: [ 'eat', 'consume' ],
+        },
         {
           type: NOUN,
         },

@@ -25,6 +25,12 @@ class Console
       var ret = game.scene.preprocessAction();
       if (!ret)
         return;
+      // debug commands
+      if (game.parserState.action == DEBUG)
+        {
+          game.debugCommands.run();
+          return;
+        }
       game.scene.runAction();
 /*
       // character generation commands

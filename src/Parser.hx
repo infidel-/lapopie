@@ -127,6 +127,7 @@ class Parser
             {
               state.action = GODIR;
               state.dir = t.dir;
+              state.actor = game.player; // for now
               return true; 
             }
         }
@@ -211,6 +212,9 @@ class Parser
                       break;
                     }
                 }
+              // always success
+              else if (itoken.type == WORDANY)
+                1;
               else
                 {
                   error('No checks for ' + itoken.type + '.');
@@ -382,6 +386,7 @@ enum _TokenType {
   DIRECTION;
   NOUN;
   WORD;
+  WORDANY;
   WORDORDIR;
   WORDS;
   // after parsing

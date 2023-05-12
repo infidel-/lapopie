@@ -26,6 +26,9 @@ abstract _Attribute(String) {
 // finally, if this is zero, then it is said to ''lead nowhere'' and otherwise the player actually moves to the location.
   var DOOR = 'DOOR';
 
+// ''Can be eaten'' (and thus removed from game).
+  var EDIBLE = 'EDIBLE';
+
 // Can't be opened. If a container and also lockable, may be called ''locked'' in inventories.
   var LOCKED = 'LOCKED';
 

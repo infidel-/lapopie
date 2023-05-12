@@ -12,17 +12,22 @@ class AbandonedFarmhouse extends Scene
       addChild(new Front(this));
       addChild(new LivingArea(this));
       addChild(new Kitchen(this));
+      addChild(new Bedroom(this));
+      addChild(new StorageArea(this));
+      addChild(new Cellar(this));
+      addChild(new Attic(this));
+      addChild(new Barn(this));
     }
 }
 
-class Front extends Room
+private class Front extends Room
 {
   public function new(parent: Obj)
     {
       super(parent);
       id = 'front';
       name = 'Abandoned Farmhouse (front)';
-     desc = 'It stands like a forgotten sentinel beside the forest road, its roof sagging with age and its walls streaked with moss and rust. The front door to the north is old but sturdy, and darkened windows peer out like empty sockets on either side.';
+      desc = 'It stands like a forgotten sentinel beside the forest road, its roof sagging with age and its walls streaked with moss and rust. The front door to the north is old but sturdy, and darkened windows peer out like empty sockets on either side.';
 // #TODO: scenery - garden, bushes, chimney
       addChild(new FrontDoor(this));
       addChild(new LeftWindow(this));
@@ -72,7 +77,6 @@ private class RightWindow extends Door
 // TODO: foundIn = [ 'kitchen' ]
 // TODO: climb, open, unlock, break
 // TODO: sound
-// TODO: clean dirt
       setAttr(CONCEALED);
     }
 
@@ -159,12 +163,40 @@ private class LivingArea extends Room
       super(parent);
       id = 'livingArea';
       name = 'Living Area';
-// #TODO: temp
 // #TODO: what if player wants to make fire?
 // #TODO: cobwebs as a hint!
 // could be a good solution to get rid of the spider!
 // but we need some wood (barn?)
-      desc = 'The weight of time rests upon dust-covered relics and a cold hearth, hinting at darker fates. A mounted black wolf head and time-worn longbow adorn the walls. The layout reveals multiple passages: a dark, open doorway to the west; a slightly ajar door to the east; and an unyielding, closed door to the north, each promising to unveil a mysterious history.';
+// #TODO: search eastern door would also find bucket
+      desc = 'Enshrouded in desolation, the deserted living area is strewn with the detritus of time. A cold, moribund hearth lies in shadow, while the sinister visage of a mounted black wolf head surveys its dominion from the wall right of it. A doorway lies in every wall, yet only the eastern and southern ones retain doors.';
+      wTo = 'bedroom';
+      nTo = 'barn';
+//      eTo = 'kitchen';
+      // NOTE: sTo unneeded
+      
+
+/**
+INITIAL
+An old longbow is affixed to the wall left of the fireplace.
+
+DOOR DESC
+The eastern door is slightly ajar.
+
+LONGBOW
+The longbow is fastened in place by some kind of mechanism.
+
+MECHANISM
+The iron clasps vanish seamlessly into the wall.
+
+BLACK WOLF HEAD
+A mounted ebony wolf's head casts a menacing glare upon you.
+
+FIREPLACE
+The hearth's stone lies dormant, devoid of warmth.
+
+SEARCH FIREPLACE
+There is nothing interesting on the outside.
+**/
       addChild(new ClayMug(this));
     }
 }
@@ -190,15 +222,33 @@ private class Kitchen extends Room
       super(parent);
       id = 'kitchen';
       name = 'Kitchen';
-      desc = "In the forsaken kitchen, filth and rubble litter the space. A gaping trapdoor beckons from the northeast ceiling corner, while a passage with a tattered door leads north, and another door heads west. A grimy cauldron sits in the fireplace, a skeletal hand protruding ominously from it.";
+      desc = "Filth and rubble litter the space. A grimy cauldron sits in the fireplace, a skeletal hand protruding ominously from it. A gaping trapdoor beckons from the northeast ceiling corner, while a passage with a tattered door leads north, and another door leads west.";
+      nTo = 'storageArea';
+//      wTo = 'door';
+      uTo = 'attic';
 
       addChild(new Barrel(this));
-/** TODO
+/**
+BUCKET
 The door to the west is slightly ajar, and there is a bucket perched precariously on top of it.
 
+INITIAL
 A heap of garments and a ripped backpack lie abandoned on the floor.
 
+CAULDRON
 The cauldron brims with an assortment of bones, raising the chilling question: are they human?
+
+BONES
+The whitened bones serve as a warning, highlighting the perils that lie in wait for unwary adventurers.
+
+GARMENTS
+A heap of modest, everyday clothing worn by commoners, has some torn and others bearing dark stains.
+
+SEARCH GARMENTS
+In a pile of commoner garments, you discover an elegant hat adorned with colorful feathers and a luxurious silk scarf.
+
+BACKPACK (same as SEARCH)
+A frayed backpack stores ordinary items, revealing a petite silver mirror and a matching silver comb.
 **/
     }
 }
@@ -211,6 +261,182 @@ private class Barrel extends Obj
       id = 'barrel';
       name = 'old barrel';
       names = [ 'old', 'barrel' ];
-      initial = 'An ancient barrel rests near the fireplace.';
+      initial = 'An aged barrel rests near the fireplace.';
     }
 }
+
+private class Bedroom extends Room
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = 'bedroom';
+      name = 'Bedroom';
+      desc = "A miasma of dust and stale air mingles with a pervasive musty odor. The lifeless form of a bird lies before an aged wardrobe, bereft of a door. The room's centerpiece, a fractured double-sized bed, is accompanied by a massive bear rug. A lone doorway to the east offers exit.";
+      eTo = 'livingArea';
+/**
+
+WARDROBE
+Aged and missing one door, the wardrobe houses a tattered cloak, a relic of bygone days.
+
+BIRD:
+The lifeless bird is covered in a peculiar golden dust. Curiously, the carcass shows no signs of physical damage.
+
+BED:
+Beneath the weight of an unseen force, the bed lies sundered in twain.
+
+BEAR SKIN:
+The dusty bear skin, a trophy of an immense and deadly creature, evokes a sense of awe and dread.
+
+CLOAK
+The ancient cloak, laden with a carpet of golden spores, emanates a noxious scent of decay. A tear in the fabric of its pocket reveals a glimpse of something metallic within.
+
+SPORES
+The peculiar spores, golden in color, emit a distinct and unpleasant scent of decay.
+**/
+    }
+}
+
+private class StorageArea extends Room
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = 'storageArea';
+      name = 'Storage Area';
+      desc = 'Numerous shelves stand burdened with the remnants of a once-thriving rural life. Broken tools, discarded horseshoes, and cracked earthenware pots serve as reminders of days long past. A heavy trapdoor leads downward, and a doorway to the south.';
+      sTo = 'kitchen';
+//      dTo = 'trapdoor';
+
+/**
+#TODO: cans do not exist
+SEARCH SHELVES
+A closer examination of the shelves uncovers a few bowstrings, a dusty oil flask and two cans of preserved meat, preserved amidst the surrounding chaos.
+
+TRAPDOOR
+The wooden trapdoor, heavy and weathered, is secured by a rusty padlock, a testament to the secrets that lie beneath.
+
+#TODO smell after opening
+OPEN
+The trapdoor opens revealing stone steps leading into the darkness.
+#TODO listen
+
+PADLOCK
+The padlock is a rusted, yet sturdy relic, guarding its secret with unwavering determination.
+
+SHELVES
+The shelves display a jumble of farm relics, including tattered grain sacks, rusted tools, and crumbling leather harnesses. A thorough search would be needed to uncover anything useful.
+
+The shelves are cluttered with various items that narrate the history of the farmhouse: tattered sacks of long-spoiled grains, rusted farming implements, and the crumbling remains of leather harnesses for horses or livestock.
+
+**/
+    }
+}
+
+private class Cellar extends Room
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = 'cellar';
+      name = 'Cellar';
+      desc = 'Within the shadowy depths of the cellar, echoes of rural existence envelop you: laden shelves brimming with sundries, timber crates, barrels, and bottles. The stench of decay permeates the air, as a macabre pile of bones lies in a corner. Stone steps lead upwards to the world above.';
+//      uTo = 'trapdoor';
+    }
+}
+
+/**
+BONES
+Every bone exhibits the telltale scars of relentless gnawing.
+
+ZOMBIE
+A shadowed figure shambles through the gloom, lamenting a single word: "Papa..."
+
+SHELVES
+Most shelf contents hold no value to you: worn tools, rusted utensils, and cracked pottery.
+
+SEARCH SHELVES
+Scouring the shelves, you uncover some usable snares.
+
+CRATES/BOXES
+Wooden boxes are haphazardly stacked in a corner.
+
+SEARCH BOXES
+Rifling through the crates, you unearth a small trove of animal pelts.
+
+BARRELS
+Some barrels appear to be filled with unknown contents.
+
+SEARCH BARRELS
+The barrels, upon closer inspection, are either empty or filled with spoiled goods.
+
+BOTTLES
+The bottles mostly contain cheap wine, vinegar, and other mundane liquids.
+
+SEARCH BOTTLES
+Upon further investigation, you discover a few bottles of quality wine.
+**/
+
+private class Attic extends Room
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = 'attic';
+      name = 'Attic';
+      desc = 'The attic, a haphazard and dusty space, is crammed with a jumble of household items, including messy stacks of extra bedding, disheveled clothing, and strewn baskets.';
+      dTo = 'kitchen';
+
+/**
+SEARCH (GENERIC)
+You find nothing useful searching theName.
+TheName holds nothing of interest.
+
+Searching through theName, you find list.
+
+BEDDING
+The disordered piles of extra bedding are scattered around the attic.
+
+CLOTHING
+Tangled peasant garments are strewn about the attic.
+
+SEARCH CLOTHING -> FIGURINE
+The animal figurine is a small, intricately carved wooden fox with a bushy tail. It has minor value.
+
+BASKETS
+Most of the baskets are empty.
+
+BASKETS -> NECKLACE
+The necklace of beads features various colorful shapes made from polished glass. It has minor value.
+**/
+    }
+}
+
+private class Barn extends Room
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = 'barn';
+      name = 'Decrepit Barn';
+      desc = 'The dusty barn creaks softly in the wind with its weathered wooden beams and walls. Heaps of decaying hay blanket the ground around a horse skeleton. Rust-covered tools lay haphazardly near the walls. There is a open doorway leading south into the house. A door leads outside north.';
+      sTo = 'livingArea';
+      cantGo = 'The farmhouse waits for you to unravel its hidden secrets.';
+    }
+}
+/**
+TODO CANTGO
+
+INITIAL
+A neglected, rusty scythe lies on the ground.
+
+TOOLS
+Rusty tools, including a hammer, pliers, and an old pitchfork, are scattered haphazardly near the walls.
+
+TAKE
+The tools are useless by now.
+
+SEARCH HAY
+The moldy hay holds nothing of interest.
+**/
+

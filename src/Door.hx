@@ -29,30 +29,15 @@ _Routine returns_   The direction property to try.
     {
       switch (action)
         {
-/* - directions
-          case ENTER:
-            if (!hasAttr(OPEN))
-              {
-                p("You can't, since " + theName + " is in the way.");
-                return false;
-              }
-          case GO:
-            if (!hasAttr(OPEN))
-              {
-                p("You can't, since " + theName + " is in the way.");
-                return false;
-              }
-*/
-          case ENTER:
+          case ENTER, GO:
             if (!hasAttr(OPEN))
               {
                 p("You can't, since " + theName + " is closed.");
                 return false;
               }
-          case GO:
-            if (!hasAttr(OPEN))
+            if (doorToObj == null)
               {
-                p("You can't, since " + theName + " is closed.");
+                p("It leads nowhere.");
                 return false;
               }
           default:

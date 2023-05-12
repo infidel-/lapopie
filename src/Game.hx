@@ -1,3 +1,6 @@
+import items.*;
+import items.Foodstuff;
+
 @:expose
 class Game
 {
@@ -6,6 +9,7 @@ class Game
   public var console: Console;
   public var root: Obj;
   public var scene: Scene;
+  public var debugCommands: DebugCommands;
 //  public var location: Location;
 //  public var combat: Combat;
   public var party: Party;
@@ -32,6 +36,7 @@ class Game
 //      options = new Options(this);
 //      combat = new Combat(this);
 //      chargen = new Chargen(this);
+      debugCommands = new DebugCommands(this);
       debug = {
         initiative: false,
       };
@@ -67,6 +72,7 @@ class Game
       party.setAttr(CONCEALED);
       player = new Character(party);
       player.setAttr(CONCEALED);
+      player.addChild(new items.Apple(player));
       party.addChild(player);
 /*
       // ============== DEMO SETUP ================
