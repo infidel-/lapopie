@@ -8,6 +8,7 @@ class Apple extends Food
       super(parent);
       id = 'apple';
       name = 'apple';
+      names = [ 'apple' ];
       article = 'an';
       desc = 'A juicy red apple, ready to offer modest nourishment.';
     }

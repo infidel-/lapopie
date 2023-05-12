@@ -40,6 +40,8 @@ class DebugCommands
             js.html.Console.log(game.party.parent);
           else if (Lambda.has([ 'player', 'p' ], secondWord))
             js.html.Console.log(game.player);
+          else if (Lambda.has([ 'scope', 's' ], secondWord))
+            js.html.Console.log(@:privateAccess game.parser.scope);
           else
             {
               p('Unknown sub-command: ' + secondWord);

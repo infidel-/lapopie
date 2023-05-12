@@ -168,6 +168,11 @@ Second special case: in a `PushDir` action, the `before` routine must call 
                 return false;
               }
           case EAT:
+            if (parent != actor)
+              {
+                p("You don't have that on you.");
+                return false;
+              }
             if (!hasAttr(EDIBLE))
               {
                 p("That's plainly inedible.");
