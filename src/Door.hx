@@ -51,9 +51,7 @@ _Routine returns_   The direction property to try.
 //      debug('door.during ' + action);
       switch (action)
         {
-          case ENTER:
-            game.party.moveTo(doorToObj);
-          case GO:
+          case ENTER, GO:
             game.party.moveTo(doorToObj);
           default:
 //            debug('default');
@@ -65,9 +63,7 @@ _Routine returns_   The direction property to try.
     {
       switch (action)
         {
-          case ENTER:
-            return '';
-          case GO:
+          case GO, ENTER:
             return '';
           default:
             return super.after();

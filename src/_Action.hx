@@ -2,6 +2,7 @@
 
 @:enum
 abstract _Action(String) {
+  var ATTACK = 'ATTACK';
   var CLOSE = 'CLOSE';
   var DROP = 'DROP';
   var DEBUG = 'DEBUG';

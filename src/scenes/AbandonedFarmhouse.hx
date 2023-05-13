@@ -33,7 +33,7 @@ private class Front extends Room
       addChild(new LeftWindow(this));
       addChild(new RightWindow(this));
       nTo = 'frontDoor';
-      cantGo = 'The farmhouse waits for you to unravel its hidden secrets.';
+      cantGo = 'The farmhouse waits for you to unravel its secrets.';
     }
 }
 
@@ -47,7 +47,7 @@ private class LeftWindow extends Obj
       names = [ 'left', 'window' ];
       desc = 'The window is covered with a thick layer of dirt.';
 // TODO: dust and wiping the dust
-// TODO: foundIn = [ 'bedroom' ]
+// TODO: foundIn = [ 'bedroom' ] + room desc mention
       setAttr(CONCEALED);
     }
 
@@ -67,6 +67,7 @@ private class LeftWindow extends Obj
 private class RightWindow extends Door
 {
   var dusty: Bool;
+  var broken: Bool;
   public function new(parent: Obj)
     {
       super(parent);
@@ -74,7 +75,9 @@ private class RightWindow extends Door
       name = 'right window';
       names = [ 'right', 'window' ];
       dusty = true;
-// TODO: foundIn = [ 'kitchen' ]
+      broken = false;
+      doorTo = 'kitchen';
+// TODO: foundIn = [ 'kitchen' ] - check link
 // TODO: climb, open, unlock, break
 // TODO: sound
       setAttr(CONCEALED);
@@ -83,6 +86,8 @@ private class RightWindow extends Door
   override function descF()
     {
       var s = 'This window is large enough to climb into. ';
+      if (broken)
+        s += 'It is completely broken.';
       if (dusty)
         s += 'It is covered with a thick layer of dirt.';
       else s += 'You have wiped the dirt away from the window.';
@@ -93,8 +98,22 @@ private class RightWindow extends Door
     {
       switch (state.action)
         {
+          case ATTACK:
+            if (broken)
+              {
+                p("You've already broken it.");
+                return false;
+              }
+          case OPEN:
+            p("It's completely stuck.");
+            return false;
           case RUB:
-            if (!dusty)
+            if (broken)
+              {
+                p("It is completely broken.");
+                return false;
+              }
+            else if (!dusty)
               {
                 p("You've already cleaned the dirt off.");
                 return false;
@@ -111,10 +130,26 @@ private class RightWindow extends Door
       return true;
     }
 
+  override function during()
+    {
+      switch (action)
+        {
+          case ATTACK:
+            broken = true;
+            dusty = false;
+            setAttr(OPEN);
+// #TODO: sound propagation
+          default:
+            super.during();
+        }
+    }
+
   public override function after(): String
     {
       switch (state.action)
         {
+          case ATTACK:
+            return "**CRASH!** As you shatter the window, the sound of broken glass echoes all around.";
           case RUB:
             dusty = false;
             return "You wipe the dirt off the right window.";

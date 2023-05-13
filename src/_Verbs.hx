@@ -6,6 +6,19 @@ class _Verbs
   public static var debugInfos: Array<_VerbInfo> = [
   ];
   public static var infos: Array<_VerbInfo> = [
+    // attack X
+    {
+      action: ATTACK,
+      tokens: [
+        {
+          type: WORDS,
+          words: [ 'attack', 'break', 'crack', 'destroy', 'fight', 'hit', 'kill', 'murder', 'punch', 'smash', 'thump', 'torture', 'wreck' ],
+        },
+        {
+          type: NOUN,
+        },
+      ],
+    },
 /**
 Verb 'close' 'cover' 'shut'
     * 'off' noun  -> SwitchOff;
@@ -17,6 +30,23 @@ Verb 'close' 'cover' 'shut'
         {
           type: WORDS,
           words: [ 'close', 'cover', 'shut' ],
+        },
+        {
+          type: NOUN,
+        },
+      ],
+    },
+    // climb in X
+    {
+      action: ENTER,
+      tokens: [
+        {
+          type: WORD,
+          word: 'climb',
+        },
+        {
+          type: WORDS,
+          words: [ 'in', 'into' ],
         },
         {
           type: NOUN,
