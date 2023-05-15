@@ -263,21 +263,18 @@ private class Kitchen extends Room
       uTo = 'attic';
 
       addChild(new Barrel(this));
+      addChild(new PileOfClothes(this));
+      addChild(new PileOfClothesStains(this));
+      addChild(new RippedBackpack(this));
 /**
 BUCKET
 The door to the west is slightly ajar, and there is a bucket perched precariously on top of it.
-
-INITIAL
-A heap of garments and a ripped backpack lie abandoned on the floor.
 
 CAULDRON
 The cauldron brims with an assortment of bones, raising the chilling question: are they human?
 
 BONES
 The whitened bones serve as a warning, highlighting the perils that lie in wait for unwary adventurers.
-
-GARMENTS
-A heap of modest, everyday clothing worn by commoners, has some torn and others bearing dark stains.
 
 SEARCH GARMENTS
 In a pile of commoner garments, you discover an elegant hat adorned with colorful feathers and a luxurious silk scarf.
@@ -294,9 +291,125 @@ private class Barrel extends Obj
     {
       super(parent);
       id = 'barrel';
+      article = 'an';
       name = 'old barrel';
       names = [ 'old', 'barrel' ];
       initial = 'An aged barrel rests near the fireplace.';
+    }
+}
+
+private class PileOfClothes extends Obj
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = 'pileOfClothes';
+      name = 'pile of clothes';
+      names = [ 'heap', 'pile', 'clothes', 'garments', 'rags', 'clothing' ];
+      // NOTE: one for both
+      describe = 'A heap of garments and a ripped backpack lie abandoned on the floor.';
+      desc = 'A heap of modest, everyday clothing worn by commoners, some torn and others bearing dark stains.';
+      addChild(new FeatheredHat(this));
+      addChild(new SilkScarf(this));
+      setAttr(SEARCHABLE);
+    }
+
+// remove children from desc
+  override function describeF()
+    {
+      return describe;
+    }
+
+  public override function before()
+    {
+      switch (state.action)
+        {
+          case TAKE:
+            p("You don't need any of these.");
+            return false;
+          default:
+            return super.before();
+        }
+      return true;
+    }
+}
+
+private class FeatheredHat extends Loot
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = 'featheredHat';
+      name = 'feathered hat';
+      names = [ 'feathered', 'hat', 'cap' ];
+      desc = 'A meticulously crafted hat of fine materials, adorned with an array of colorful feathers.';
+// TODO
+//      price = 1 * GP;
+      setAttr(HIDDEN);
+    }
+}
+
+private class SilkScarf extends Loot
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = 'silkScarf';
+      name = 'silk scarf';
+      names = [ 'silk', 'scarf' ];
+      desc = 'The luxurious silk scarf exudes captivating sheen and displays exceptional craftsmanship.';
+// TODO
+//      price = 1 * GP;
+      setAttr(HIDDEN);
+    }
+}
+
+private class PileOfClothesStains extends Obj
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = 'stains';
+      name = 'dark stains';
+      names = [ 'dark', 'stains' ];
+      desc = 'The deep-hued stains bear an unsettling resemblance to dried blood.';
+      setAttr(CONCEALED);
+    }
+
+  public override function after(): String
+    {
+      switch (state.action)
+        {
+          case RUB, SMELL, TOUCH:
+            return "That is indeed dried blood. It looks like it's a few days old.";
+          default:
+            return super.after();
+        }
+    }
+}
+
+private class RippedBackpack extends Item
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = 'rippedBackpack';
+      name = 'torn backpack';
+      names = [ 'ripped', 'torn', 'backpack' ];
+      // NOTE: no initial
+    }
+
+  public override function before()
+    {
+      switch (state.action)
+        {
+          case TAKE:
+            p("It's all torn up and useless.");
+            return false;
+          default:
+            return super.before();
+        }
+      return true;
     }
 }
 
@@ -344,9 +457,8 @@ private class StorageArea extends Room
 //      dTo = 'trapdoor';
 
 /**
-#TODO: cans do not exist
 SEARCH SHELVES
-A closer examination of the shelves uncovers a few bowstrings, a dusty oil flask and two cans of preserved meat, preserved amidst the surrounding chaos.
+A closer examination of the shelves uncovers a few bowstrings, a dusty oil flask and two jars of preserved meat, preserved amidst the surrounding chaos.
 
 TRAPDOOR
 The wooden trapdoor, heavy and weathered, is secured by a rusty padlock, a testament to the secrets that lie beneath.

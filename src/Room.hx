@@ -70,7 +70,8 @@ _No return value_
         if (!ch.hasAttr(CONCEALED))
           {
             // initial description
-            if (!ch.hasAttr(MOVED))
+            if (!ch.hasAttr(STATIC) &&
+                !ch.hasAttr(MOVED))
               {
                 var tmp = ch.initialF();
                 if (tmp != null && tmp != '')

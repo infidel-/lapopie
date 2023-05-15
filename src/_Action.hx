@@ -15,7 +15,9 @@ abstract _Action(String) {
   var LOOK = 'LOOK';
   var OPEN = 'OPEN';
   var RUB = 'RUB';
+  var SMELL = 'SMELL';
   var SEARCH = 'SEARCH';
   var TAKE = 'TAKE';
+  var TOUCH = 'TOUCH';
   var UNLOCK = 'UNLOCK';
 }

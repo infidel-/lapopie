@@ -27,8 +27,19 @@ class DebugCommands
           return;
         }
 
+      if (Lambda.has([ 'move' ], firstWord))
+        {
+          var room = game.scene.findObject(secondWord);
+          if (room == null)
+            {
+              p('No such object found.');
+              return;
+            }
+          game.party.moveTo(room);
+        }
+
       // print something
-      if (Lambda.has([ 'print', 'p' ], firstWord))
+      else if (Lambda.has([ 'print', 'p' ], firstWord))
         {
           if (secondWord == null)
             {

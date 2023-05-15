@@ -346,6 +346,14 @@ class Parser
         {
           for (name in ch.names)
             addName(scope, name, ch);
+          // children of searched items
+          if (ch.hasAttr(SEARCHED))
+            for (subch in ch.children)
+              if (!ch.hasAttr(CONCEALED))
+                {
+                  for (name in subch.names)
+                    addName(scope, name, subch);
+                }
         }
 //      trace(scope);
       // player inventory

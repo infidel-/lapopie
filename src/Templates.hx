@@ -22,8 +22,24 @@ private class C extends Item
       id = '';
       name = '';
       names = [];
-      desc = '';
       initial = '';
+      desc = '';
+    }
+}
+
+LOOT
+
+private class C extends Loot
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = '';
+      name = '';
+      names = [];
+      initial = '';
+      desc = '';
+      value = 1 * GP;
     }
 }
 
@@ -38,6 +54,7 @@ private class B extends Obj
       name = '';
       names = [];
       initial = '';
+      desc = '';
     }
 }
 

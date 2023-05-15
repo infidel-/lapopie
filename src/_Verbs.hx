@@ -432,8 +432,21 @@ Verb 'put'
       action: SEARCH,
       tokens: [
         {
-          type: WORD,
-          word: 'search',
+          type: WORDS,
+          words: [ 'search', 'src', 'sr', 's' ],
+        },
+        {
+          type: NOUN,
+        },
+      ],
+    },
+    // smell X
+    {
+      action: SMELL,
+      tokens: [
+        {
+          type: WORDS,
+          words: [ 'smell', 'sniff' ],
         },
         {
           type: NOUN,
@@ -456,6 +469,19 @@ Verb 'take'
           word: 'take',
         },
         // TODO: multi
+        {
+          type: NOUN,
+        },
+      ],
+    },
+    // touch X
+    {
+      action: TOUCH,
+      tokens: [
+        {
+          type: WORDS,
+          words: [ 'touch', 'feel', 'fondle', 'grope', ],
+        },
         {
           type: NOUN,
         },

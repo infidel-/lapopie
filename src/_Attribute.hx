@@ -29,8 +29,14 @@ abstract _Attribute(String) {
 // ''Can be eaten'' (and thus removed from game).
   var EDIBLE = 'EDIBLE';
 
+// Hidden objects can be uncovered by searching their parent (they need to have SEARCHABLE flag) before being available for actions.
+  var HIDDEN = 'HIDDEN';
+
 // Can't be opened. If a container and also lockable, may be called ''locked'' in inventories.
   var LOCKED = 'LOCKED';
+
+// Various loot, has value and can be sold, but otherwise useless
+  var LOOT = 'LOOT';
 
 // Can be locked or unlocked by a player holding its key object, which is given by the property with_key;
 // if a container and also locked, may be called ''locked'' in inventories.
@@ -50,6 +56,12 @@ abstract _Attribute(String) {
 // things can be taken or removed from an open container;
 // similarly inserted, transferred or emptied. A container can only be entered or exited if it is both enterable and open. An open door can be entered. Described by when_open in room descriptions.
   var OPEN = 'OPEN';
+
+// Can be searched by standard command. Will loop through children with HIDDEN attribute and remove it.
+  var SEARCHABLE = 'SEARCHABLE';
+// Searching the SEARCHABLE objects will mark them as SEARCHED
+// After that all visible children will be printed in room and object description.
+  var SEARCHED = 'SEARCHED';
 
 // ''Fixed in place'' if player tries to take, remove, pull, push or turn.
   var STATIC = 'STATIC';

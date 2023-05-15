@@ -37,7 +37,7 @@ class Obj
       type = 'object';
       id = 'OBJECT';
       name = 'OBJECT';
-      desc = 'OBJECT';
+      desc = '';
       names = [ 'OBJECT' ];
 //      foundIn = [];
       children = [];
@@ -77,7 +77,30 @@ _No return value
   public var desc: String;
   function descF(): String
     {
-      return desc;
+      var s = desc;
+      if (s == '')
+        s = 'You see nothing special about ' + theName + '.';
+      // add children
+      s += descChildren();
+      return s;
+    }
+
+// add children to desc/describe lines
+  function descChildren(): String
+    {
+      var s = '';
+      // searchable objects that were searched
+      // will print found contents after that
+      if (hasAttr(SEARCHED))
+        {
+          var tmp = [];
+          for (ch in children)
+            if (!ch.hasAttr(CONCEALED))
+              tmp.push(ch);
+          s += ' It contains ' +
+            stringChildrenPartial(tmp) + '.';
+        }
+      return s;
     }
 
 /**
@@ -92,6 +115,7 @@ describe "There are holes in the soft dirt near your feet.",
   public var describe: String;
   function describeF(): String
     {
+      var s = '';
 //      debug('describeF');
       // door descriptions
       if (hasAttr(DOOR))
@@ -100,21 +124,21 @@ describe "There are holes in the soft dirt near your feet.",
             {
               if (whenOpen != null &&
                   whenOpen != '')
-                return whenOpen;
+                s += whenOpen;
               else if (whenOpenF != null)
-                return whenOpenF();
+                s += whenOpenF();
               // default
-              return TheName + ' is open.';
+              s += TheName + ' is open.';
             }
           else
             {
               if (whenClosed != null &&
                   whenClosed != '')
-                return whenClosed;
+                s += whenClosed;
               else if (whenClosedF != null)
-                return whenClosedF();
+                s += whenClosedF();
               // default
-              return TheName + ' is closed.';
+              s += TheName + ' is closed.';
             }
         }
       else
@@ -124,10 +148,13 @@ describe "There are holes in the soft dirt near your feet.",
             return initial;
           var initial*/
           if (describe != null && describe != '')
-            return describe;
-          else return 'There is ' + aName + ' here.';
+            s += describe;
+          else s += 'There is ' + aName + ' here.';
         }
-      return '';
+      // add children
+      s += descChildren();
+
+      return s;
     }
 
 // runs before every command
@@ -194,6 +221,12 @@ Second special case: in a `PushDir` action, the `before` routine must call 
                 p("That's already open.");
                 return false;
               }
+          case SEARCH:
+            if (hasAttr(SEARCHED))
+              {
+                p("You have already searched that.");
+                return false;
+              }
           case TAKE:
             if (parent == actor)
               {
@@ -224,6 +257,21 @@ Second special case: in a `PushDir` action, the `before` routine must call 
             destroy();
           case OPEN:
             setAttr(OPEN);
+          case SEARCH:
+            // find stuff - unhide it
+            if (hasAttr(SEARCHABLE))
+              {
+                var tmp = [];
+                for (ch in children)
+                  if (ch.hasAttr(HIDDEN))
+                    {
+                      ch.unsetAttr(HIDDEN);
+                      tmp.push(ch);
+                    }
+                p('Searching through ' + theName +
+                  ', you find ' + stringChildrenPartial(tmp) + '.');
+                setAttr(SEARCHED);
+              }
           case TAKE:
             moveTo(actor);
             if (!hasAttr(MOVED))
@@ -263,8 +311,17 @@ The `Search` action is a slightly special case. Here, `after` is called when
             else return "You open " + theName + ".";
           case RUB:
             return "You achieve nothing by this.";
+          case SEARCH:
+            // suppress after the successful action 
+            if (hasAttr(SEARCHED))
+              return '';
+            return "You find nothing of interest.";
+          case SMELL:
+            return "You smell nothing unexpected.";
           case TAKE:
             return 'Taken.';
+          case TOUCH:
+            return "You feel nothing unexpected.";
           default:
             debug('default message');
         }
@@ -383,20 +440,26 @@ The `Search` action is a slightly special case. Here, `after` is called when
       return true;
     }
 
-// get a string with list of children
+// get a string with partial list of children
   public function stringChildren(): String
     {
+      return stringChildrenPartial(children);
+    }
+
+// get a string with list of children
+  public function stringChildrenPartial(list: Array<Obj>): String
+    {
       var s = '';
-      for (i in 0...children.length)
+      for (i in 0...list.length)
         {
-          var ch = children[i];
+          var ch = list[i];
           s += ch.aName;
-          if (children.length == 1)
+          if (list.length == 1)
             continue;
 
-          if (i == children.length - 2)
+          if (i == list.length - 2)
             s += ' and ';
-          else if (i != children.length - 1)
+          else if (i != list.length - 1)
             s += ', ';
         }
       return s;
