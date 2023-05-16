@@ -126,7 +126,7 @@ class Game
 */
       console.runCommand('open door');
 //      console.runCommand('n');
-      console.runCommand('dbg move kitchen');
+//      console.runCommand('dbg move kitchen');
 #end
     }
 

@@ -178,6 +178,9 @@ Second special case: in a `PushDir` action, the `before` routine must call 
         return true;
       switch (action)
         {
+          case CLIMB:
+            p("I don't think much is to be achieved by that.");
+            return false;
           case CLOSE:
             if (!hasAttr(OPENABLE))
               {
@@ -239,6 +242,9 @@ Second special case: in a `PushDir` action, the `before` routine must call 
                 p("That's fixed in place.");
                 return false;
               }
+          case XYZZY:
+            p('Nothing happened... Or did it?');
+            return false;
           default:
         }
       return true;
@@ -543,6 +549,12 @@ The `Search` action is a slightly special case. Here, `after` is called when
   public inline function p(s: String)
     {
       game.console.print(s);
+    }
+
+// returns whether this object is a link
+  public function isLink(): Bool
+    {
+      return (StringTools.endsWith(id, 'Link'));
     }
 
 // get state

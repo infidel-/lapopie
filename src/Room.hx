@@ -57,15 +57,15 @@ _No return value_
 // room description, full or brief
   public function descRoom(forceFull: Bool)
     {
-      var s = '**' + name + '**\n';
+      var s = '**' + name + '**';
       // mark room as visited on first "look"
       if (!hasAttr(VISITED))
         {
-          s += desc;
+          s += '\n' + desc;
           setAttr(VISITED);
         }
       else if (forceFull)
-        s += desc;
+        s += '\n' + desc;
       for (ch in children)
         if (!ch.hasAttr(CONCEALED))
           {

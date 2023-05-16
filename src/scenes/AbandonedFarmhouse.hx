@@ -79,25 +79,29 @@ private class RightWindow extends Door
       dusty = true;
       broken = false;
       doorTo = 'kitchen';
-// TODO: foundIn = [ 'kitchen' ] - check link
-// TODO: climb, open, unlock, break
+      doorDir = NE;
 // TODO: sound
       setAttr(CONCEALED);
     }
 
   override function descF()
     {
-      var s = 'This window is large enough to climb into. ';
+      var s = 'The window is large enough to climb into.';
       if (broken)
-        s += 'It is completely broken.';
-      if (dusty)
-        s += 'It is covered with a thick layer of dirt.';
-      else s += 'You have wiped the dirt away from the window.';
+        s += ' It is completely broken.';
+      else
+        {
+          if (dusty)
+            s += ' It is covered with a thick layer of dirt.';
+          else s += ' You have wiped the dirt away from the window.';
+        }
       return s;
     }
 
   public override function before()
     {
+      if (state.action == CLIMB)
+        state.action = ENTER;
       switch (state.action)
         {
           case ATTACK:
@@ -139,6 +143,8 @@ private class RightWindow extends Door
           case ATTACK:
             broken = true;
             dusty = false;
+            untyped linkedObj.broken = true;
+            untyped linkedObj.dusty = false;
             setAttr(OPEN);
 // #TODO: sound propagation
           default:
@@ -154,6 +160,7 @@ private class RightWindow extends Door
             return "**CRASH!** As you shatter the window, the sound of broken glass echoes all around.";
           case RUB:
             dusty = false;
+            untyped linkedObj.dusty = false;
             return "You wipe the dirt off the right window.";
           case SEARCH:
             var kitchen = scene.findObject('kitchen').asRoom();

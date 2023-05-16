@@ -37,7 +37,8 @@ class Scene extends Obj
       // create a double for each door on the other side
       for (door in initDoors)
         {
-          if (door.doorDir == null || door.doorTo == null)
+          if (door.doorDir == null ||
+              door.doorTo == null)
             continue;
           var doorClass = Type.getClass(door);
           var door2 = Type.createInstance(doorClass, [ door.doorToObj ]);

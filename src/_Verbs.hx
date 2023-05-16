@@ -36,6 +36,36 @@ Verb 'close' 'cover' 'shut'
         },
       ],
     },
+    // climb up X
+    {
+      action: CLIMB,
+      tokens: [
+        {
+          type: WORDS,
+          words: [ 'climb', 'scale' ],
+        },
+        {
+          type: WORDS,
+          words: [ 'up', 'over' ],
+        },
+        {
+          type: NOUN,
+        },
+      ],
+    },
+    // climb X
+    {
+      action: CLIMB,
+      tokens: [
+        {
+          type: WORDS,
+          words: [ 'climb', 'scale' ],
+        },
+        {
+          type: NOUN,
+        },
+      ],
+    },
     // climb in X
     {
       action: ENTER,
@@ -484,6 +514,15 @@ Verb 'take'
         },
         {
           type: NOUN,
+        },
+      ],
+    },
+    {
+      action: XYZZY,
+      tokens: [
+        {
+          type: WORD,
+          word: 'xyzzy',
         },
       ],
     },

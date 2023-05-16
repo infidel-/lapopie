@@ -3,6 +3,7 @@
 @:enum
 abstract _Action(String) {
   var ATTACK = 'ATTACK';
+  var CLIMB = 'CLIMB';
   var CLOSE = 'CLOSE';
   var DROP = 'DROP';
   var DEBUG = 'DEBUG';
@@ -20,4 +21,5 @@ abstract _Action(String) {
   var TAKE = 'TAKE';
   var TOUCH = 'TOUCH';
   var UNLOCK = 'UNLOCK';
+  var XYZZY = 'XYZZY';
 }
