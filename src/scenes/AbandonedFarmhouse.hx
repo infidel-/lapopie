@@ -1,6 +1,8 @@
 // abandoned farmhouse scene
 package scenes;
 
+import items.Loot;
+
 class AbandonedFarmhouse extends Scene
 {
   public function new(parent: Obj)
@@ -275,12 +277,6 @@ The cauldron brims with an assortment of bones, raising the chilling question: a
 
 BONES
 The whitened bones serve as a warning, highlighting the perils that lie in wait for unwary adventurers.
-
-SEARCH GARMENTS
-In a pile of commoner garments, you discover an elegant hat adorned with colorful feathers and a luxurious silk scarf.
-
-BACKPACK (same as SEARCH)
-A frayed backpack stores ordinary items, revealing a petite silver mirror and a matching silver comb.
 **/
     }
 }
@@ -332,35 +328,16 @@ private class PileOfClothes extends Obj
         }
       return true;
     }
-}
 
-private class FeatheredHat extends Loot
-{
-  public function new(parent: Obj)
+  public override function after(): String
     {
-      super(parent);
-      id = 'featheredHat';
-      name = 'feathered hat';
-      names = [ 'feathered', 'hat', 'cap' ];
-      desc = 'A meticulously crafted hat of fine materials, adorned with an array of colorful feathers.';
-// TODO
-//      price = 1 * GP;
-      setAttr(HIDDEN);
-    }
-}
-
-private class SilkScarf extends Loot
-{
-  public function new(parent: Obj)
-    {
-      super(parent);
-      id = 'silkScarf';
-      name = 'silk scarf';
-      names = [ 'silk', 'scarf' ];
-      desc = 'The luxurious silk scarf exudes captivating sheen and displays exceptional craftsmanship.';
-// TODO
-//      price = 1 * GP;
-      setAttr(HIDDEN);
+      switch (state.action)
+        {
+          case SEARCH:
+            return 'In a pile of commoner garments, you discover an elegant hat adorned with colorful feathers and a luxurious silk scarf.';
+          default:
+            return super.after();
+        }
     }
 }
 
@@ -395,8 +372,12 @@ private class RippedBackpack extends Item
       super(parent);
       id = 'rippedBackpack';
       name = 'torn backpack';
-      names = [ 'ripped', 'torn', 'backpack' ];
+      names = [ 'ripped', 'torn', 'backpack', 'pack' ];
+      desc = 'A completely torn backpack lies on the floor.';
       // NOTE: no initial
+      addChild(new SilverMirror(this));
+      addChild(new SilverComb(this));
+      setAttr(SEARCHABLE);
     }
 
   public override function before()
@@ -406,10 +387,24 @@ private class RippedBackpack extends Item
           case TAKE:
             p("It's all torn up and useless.");
             return false;
+          case OPEN:
+            p("It's already open.");
+            return false;
           default:
             return super.before();
         }
       return true;
+    }
+
+  public override function after(): String
+    {
+      switch (state.action)
+        {
+          case SEARCH:
+            return 'A frayed backpack stores ordinary items, revealing a petite silver mirror and a matching silver comb.';
+          default:
+            return super.after();
+        }
     }
 }
 

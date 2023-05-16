@@ -13,6 +13,7 @@ class Obj
   var second(get, null): Obj;
   var dir(get, null): _CompassDirection;
   var attrs: Array<_Attribute>;
+  var tmpstr: String; // used as temp for during messages
 
   public var type: String;
   public var id: String;
@@ -268,8 +269,8 @@ Second special case: in a `PushDir` action, the `before` routine must call 
                       ch.unsetAttr(HIDDEN);
                       tmp.push(ch);
                     }
-                p('Searching through ' + theName +
-                  ', you find ' + stringChildrenPartial(tmp) + '.');
+                tmpstr = 'Searching through ' + theName +
+                  ', you find ' + stringChildrenPartial(tmp) + '.';
                 setAttr(SEARCHED);
               }
           case TAKE:
@@ -314,7 +315,7 @@ The `Search` action is a slightly special case. Here, `after` is called when
           case SEARCH:
             // suppress after the successful action 
             if (hasAttr(SEARCHED))
-              return '';
+              return tmpstr;
             return "You find nothing of interest.";
           case SMELL:
             return "You smell nothing unexpected.";
