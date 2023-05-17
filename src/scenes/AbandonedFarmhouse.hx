@@ -10,7 +10,7 @@ class AbandonedFarmhouse extends Scene
       super(parent);
       id = 'abandonedFarmhouse';
       name = 'Abandoned Farmhouse Scene';
-      dm = "You see a bleak, abandoned farmhouse by the forest road, its forlorn visage revealing years of decay. Aged walls stand firm, as a decaying chimney and untamed garden exude a somber mood. Yet, despite its desolation, the farmhouse hold an odd allure, beckoning you with the promise of forgotten secrets and hidden treasures within.";
+      dm = "You see a bleak, abandoned farmhouse by the forest road, its forlorn visage revealing years of decay. Aged walls stand firm, as a decaying chimney and untamed garden exude a somber mood. Yet, despite its desolation, the farmhouse holds an odd allure, beckoning you with the promise of forgotten secrets and hidden treasures within.";
       addChild(new Front(this));
       addChild(new LivingArea(this));
       addChild(new Kitchen(this));
@@ -183,8 +183,8 @@ private class FrontDoor extends Door
       names = [ 'front', 'wooden', 'door', 'old', 'sturdy' ];
       desc = 'The door is made of thick oak, with visible grooves and knots that give it a rugged, weathered look. The brass doorknob is tarnished, and there are scratches and dings on the surface.';
 // TODO: doorknob, turn it
-      doorTo = 'livingArea';
       doorDir = NORTH;
+      doorTo = 'livingArea';
     }
 
   public override function after(): String
@@ -215,16 +215,12 @@ private class LivingArea extends Room
       desc = 'Enshrouded in desolation, the deserted living area is strewn with the detritus of time. A cold, moribund hearth lies in shadow, while the sinister visage of a mounted black wolf head surveys its dominion from the wall right of it. A doorway lies in every wall, yet only the eastern and southern ones retain doors.';
       wTo = 'bedroom';
       nTo = 'barn';
-//      eTo = 'kitchen';
-      // NOTE: sTo unneeded
-      
+      eTo = 'kitchenDoor';
+      // NOTE: sTo is a link
 
 /**
 INITIAL
 An old longbow is affixed to the wall left of the fireplace.
-
-DOOR DESC
-The eastern door is slightly ajar.
 
 LONGBOW
 The longbow is fastened in place by some kind of mechanism.
@@ -242,6 +238,108 @@ SEARCH FIREPLACE
 There is nothing interesting on the outside.
 **/
       addChild(new ClayMug(this));
+      addChild(new KitchenDoor(this));
+    }
+}
+
+private class KitchenDoor extends Door
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = 'kitchenDoor';
+      name = 'eastern door';
+      linkedName = 'western door';
+      names = [ 'east', 'eastern', 'door' ];
+      linkedNames = [ 'west', 'western', 'door' ];
+      // TODO! after change: use TheName
+      // TODO: open before removing bucket
+      // TODO: all related to link
+      whenClosed = 'The eastern door is slightly ajar.';
+//      desc = 'Through the door crack, the neglected kitchen is partially visible.';
+      doorDir = EAST;
+      doorTo = 'kitchen';
+      setAttr(SEARCHABLE);
+      addChild(new LivingAreaBucket(this));
+    }
+
+  override function descChildren()
+    { return ''; }
+
+  override function descF()
+    {
+      if (hasAttr(OPEN))
+        return 'The door is open.';
+      var bucket = getChild('bucketLivingArea');
+      if (!hasAttr(OPEN) && bucket == null)
+        return 'The door is closed.';
+      var s = 'The door is slightly open leaving a crack.';
+      if (bucket != null)
+        {
+          if (bucket.hasAttr(HIDDEN))
+            s += ' There is something on top of it.';
+          else s += ' There is a rusty bucket on top of it.';
+        }
+      return s;
+    }
+
+  public override function after(): String
+    {
+      switch (state.action)
+        {
+          case SEARCH:
+            return 'Upon closely inspecting the door, you discover a bucket on top of it.';
+          default:
+            return super.after();
+        }
+    }
+}
+
+private class LivingAreaBucket extends Item
+{
+  public function new(parent: Obj)
+    {
+      super(parent);
+      id = 'bucketLivingArea';
+      name = 'rusty bucket';
+      names = [ 'rusty', 'bucket' ];
+      setAttr(HIDDEN);
+    }
+
+  override function descF()
+    {
+      if (hasAttr(CONCEALED))
+        return 'It is safely out of the way.';
+      else return 'Perched precariously atop the door, the rust-covered bucket is bound to tumble down upon opening.';
+    }
+
+  public override function before()
+    {
+      switch (state.action)
+        {
+          case TAKE:
+            if (hasAttr(CONCEALED))
+              {
+                p("It's useless.");
+                return false;
+              }
+          default:
+            return super.before();
+        }
+      return true;
+    }
+
+  public override function after(): String
+    {
+      switch (state.action)
+        {
+          case TAKE:
+            setAttr(CONCEALED);
+            moveTo(actor.getRoom());
+            return 'With great caution, you remove the bucket from its perch atop the door and set it aside.';
+          default:
+            return super.after();
+        }
     }
 }
 
@@ -268,7 +366,7 @@ private class Kitchen extends Room
       name = 'Kitchen';
       desc = "Filth and rubble litter the space. A grimy cauldron sits in the fireplace, a skeletal hand protruding ominously from it. A gaping trapdoor beckons from the northeast ceiling corner, while a passage with a tattered door leads north, and another door leads west.";
       nTo = 'storageArea';
-//      wTo = 'door';
+      // NOTE: wTo is a link
       uTo = 'attic';
 
       addChild(new Barrel(this));

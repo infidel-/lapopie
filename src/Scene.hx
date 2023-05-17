@@ -45,6 +45,10 @@ class Scene extends Obj
 // may be tricky
 //          door2.init();
           door2.id += 'Link';
+          if (door.linkedName != null)
+            door2.name = door.linkedName;
+          if (door.linkedNames != null)
+            door2.names = door.linkedNames;
           door2.doorDir = Const.compassDirectionReverse[door.doorDir];
           door2.doorTo = door.parent.id;
           door2.doorToObj = door.parent;

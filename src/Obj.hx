@@ -26,6 +26,8 @@ class Obj
 // linked object in another location
 // for example, other side of the same door
   public var linkedObj: Obj;
+  public var linkedName: String;
+  public var linkedNames: Array<String>;
 
   public function new(parent: Obj)
     {
@@ -98,8 +100,9 @@ _No return value
           for (ch in children)
             if (!ch.hasAttr(CONCEALED))
               tmp.push(ch);
-          s += ' It contains ' +
-            stringChildrenPartial(tmp) + '.';
+          if (tmp.length > 0)
+            s += ' It contains ' +
+              stringChildrenPartial(tmp) + '.';
         }
       return s;
     }
@@ -129,7 +132,7 @@ describe "There are holes in the soft dirt near your feet.",
               else if (whenOpenF != null)
                 s += whenOpenF();
               // default
-              s += TheName + ' is open.';
+              else s += TheName + ' is open.';
             }
           else
             {
@@ -139,7 +142,7 @@ describe "There are holes in the soft dirt near your feet.",
               else if (whenClosedF != null)
                 s += whenClosedF();
               // default
-              s += TheName + ' is closed.';
+              else s += TheName + ' is closed.';
             }
         }
       else
@@ -299,6 +302,8 @@ The `Search` action is a slightly special case. Here, `after` is called when
     {
       switch (action)
         {
+          case ATTACK:
+            return "Violence isn't the answer to this one.";
           case CLOSE:
             return "You close " + theName + ".";
           case DROP:

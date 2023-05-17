@@ -125,7 +125,7 @@ class Game
 //      scene.moveTo('reflection');
 */
       console.runCommand('open door');
-//      console.runCommand('n');
+      console.runCommand('n');
 //      console.runCommand('dbg move kitchen');
 #end
     }
