@@ -83,10 +83,19 @@ class Parser
         {
           // check for verbs
           if (verbs[w] != null)
-            state.tokens.push({
-              type: VERB,
-              word: w,
-            });
+            {
+              // could be a dir too (s - search/south)
+              if (dirs[w] != null)
+                state.tokens.push({
+                  type: VERBORDIR,
+                  word: w,
+                  dir: dirs[w],
+                });
+              else state.tokens.push({
+                type: VERB,
+                word: w,
+              });
+            }
           // check for scoped nouns
           else if (scope[w] != null)
             {
@@ -95,6 +104,7 @@ class Parser
                 state.tokens.push({
                   type: NOUNORDIR,
                   word: w,
+                  dir: dirs[w],
                 });
               else*/ state.tokens.push({
                   type: NOUN,
@@ -122,8 +132,7 @@ class Parser
       if (state.tokens.length == 1)
         {
           var t = state.tokens[0];
-          if (t.type == DIRECTION ||
-              t.type == WORDORDIR)
+          if (Lambda.has([ DIRECTION, WORDORDIR, VERBORDIR ], t.type))
             {
               state.action = GODIR;
               state.dir = t.dir;
@@ -133,7 +142,8 @@ class Parser
         }
 
       // first token must be a verb (for now?)
-      if (state.tokens[0].type != VERB)
+      if (state.tokens[0].type != VERB &&
+          state.tokens[0].type != VERBORDIR)
         {
           game.console.debug('' + state.tokens);
           error('Commands must start with a verb.');
@@ -162,6 +172,7 @@ class Parser
                 {
                   if (stoken.type != WORDORDIR &&
                       stoken.type != WORD &&
+                      stoken.type != VERBORDIR &&
                       stoken.type != VERB)
                     {
                       ok = false;
@@ -176,7 +187,8 @@ class Parser
               else if (itoken.type == WORDS)
                 {
                   if (stoken.type != WORD &&
-                      stoken.type != VERB)
+                      stoken.type != VERB &&
+                      stoken.type != VERBORDIR)
                     {
                       ok = false;
                       break;
@@ -206,7 +218,8 @@ class Parser
               else if (itoken.type == DIRECTION)
                 {
                   if (stoken.type != DIRECTION &&
-                      stoken.type != WORDORDIR)
+                      stoken.type != WORDORDIR &&
+                      stoken.type != VERBORDIR)
                     {
                       ok = false;
                       break;
@@ -397,6 +410,7 @@ enum _TokenType {
   WORDANY;
   WORDORDIR;
   WORDS;
+  VERBORDIR;
   // after parsing
   OBJECT;
   VERB;

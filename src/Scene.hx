@@ -36,37 +36,7 @@ class Scene extends Obj
       // door fixing
       // create a double for each door on the other side
       for (door in initDoors)
-        {
-          if (door.doorDir == null ||
-              door.doorTo == null)
-            continue;
-          var doorClass = Type.getClass(door);
-          var door2 = Type.createInstance(doorClass, [ door.doorToObj ]);
-// may be tricky
-//          door2.init();
-          door2.id += 'Link';
-          if (door.linkedName != null)
-            door2.name = door.linkedName;
-          if (door.linkedNames != null)
-            door2.names = door.linkedNames;
-          door2.doorDir = Const.compassDirectionReverse[door.doorDir];
-          door2.doorTo = door.parent.id;
-          door2.doorToObj = door.parent;
-          door2.linkedObj = door;
-          for (dir in Const.compassPropsReverse.keys())
-            {
-              var obj = Reflect.field(door.parent, dir + 'ToObj');
-              if (obj != door)
-                continue;
-              var reverse = Const.compassPropsReverse[dir];
-              Reflect.setField(door2.parent,
-                reverse + 'ToObj', door2);
-              Reflect.setField(door2.parent,
-                reverse + 'To', door2.id);
-            }
-          door.doorToObj.addChild(door2);
-          door.linkedObj = door2;
-        }
+        door.link();
       initDoors = null;
     }
 

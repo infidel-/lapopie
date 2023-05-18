@@ -126,21 +126,17 @@ describe "There are holes in the soft dirt near your feet.",
         {
           if (hasAttr(OPEN))
             {
-              if (whenOpen != null &&
-                  whenOpen != '')
-                s += whenOpen;
-              else if (whenOpenF != null)
-                s += whenOpenF();
+              var f = whenOpenF();
+              if (f != '' && f != null)
+                s += f;
               // default
               else s += TheName + ' is open.';
             }
           else
             {
-              if (whenClosed != null &&
-                  whenClosed != '')
-                s += whenClosed;
-              else if (whenClosedF != null)
-                s += whenClosedF();
+              var f = whenClosedF();
+              if (f != '' && f != null)
+                s += f;
               // default
               else s += TheName + ' is closed.';
             }
@@ -646,13 +642,15 @@ _String or routine_
 _For objects_   Description, or routine to print one, of something closed (a `door` or `container`) in a room's long description.  
 _No return value_
 */
-  public var whenClosed: String;
-  public var whenClosedF: Void -> String;
+  var whenClosed: String;
+  function whenClosedF()
+    { return whenClosed; }
 /*
 String or routine_
 _For objects_   Description, or routine to print one, of something open (a `door` or `container`) in a room's long description.  
 _No return value
 */
-  public var whenOpen: String;
-  public var whenOpenF: Void -> String;
+  var whenOpen: String;
+  function whenOpenF()
+    { return whenOpen; }
 }

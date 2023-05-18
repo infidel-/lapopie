@@ -81,4 +81,45 @@ _Routine returns_   The direction property to try.
       // to create their other sides
       scene.initDoors.push(this);
     }
+
+// make a linked door
+  public function link()
+    {
+      // not really a door
+      if (doorDir == null ||
+          doorTo == null)
+        return;
+
+      var doorClass = Type.getClass(this);
+      var link = Type.createInstance(doorClass, [ doorToObj ]);
+// may be tricky
+//          link.init();
+      link.id += 'Link';
+      if (linkedName != null)
+        link.name = linkedName;
+      if (linkedNames != null)
+        link.names = linkedNames;
+      link.doorDir = Const.compassDirectionReverse[doorDir];
+      link.doorTo = parent.id;
+      link.doorToObj = parent;
+      link.linkedObj = this;
+      // set reverse xTo and xToObj in link parent
+      for (dir in Const.compassPropsReverse.keys())
+        {
+          // find dir
+          var obj = Reflect.field(parent, dir + 'ToObj');
+          if (obj != this)
+            continue;
+          // set up reverse
+          var reverse = Const.compassPropsReverse[dir];
+          Reflect.setField(link.parent,
+            reverse + 'ToObj', link);
+          Reflect.setField(link.parent,
+            reverse + 'To', link.id);
+          // set link parent dirObj
+          link.parent.asRoom().dirObj[link.doorDir] = link;
+        }
+      doorToObj.addChild(link);
+      linkedObj = link;
+    }
 }

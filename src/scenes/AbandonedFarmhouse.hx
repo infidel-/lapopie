@@ -207,11 +207,11 @@ private class LivingArea extends Room
       super(parent);
       id = 'livingArea';
       name = 'Living Area';
-// #TODO: what if player wants to make fire?
-// #TODO: cobwebs as a hint!
+// TODO: what if player wants to make fire?
+// TODO: cobwebs as a hint!
 // could be a good solution to get rid of the spider!
 // but we need some wood (barn?)
-// #TODO: search eastern door would also find bucket
+// TODO: check desc for scenery
       desc = 'Enshrouded in desolation, the deserted living area is strewn with the detritus of time. A cold, moribund hearth lies in shadow, while the sinister visage of a mounted black wolf head surveys its dominion from the wall right of it. A doorway lies in every wall, yet only the eastern and southern ones retain doors.';
       wTo = 'bedroom';
       nTo = 'barn';
@@ -252,15 +252,20 @@ private class KitchenDoor extends Door
       linkedName = 'western door';
       names = [ 'east', 'eastern', 'door' ];
       linkedNames = [ 'west', 'western', 'door' ];
-      // TODO! after change: use TheName
-      // TODO: open before removing bucket
       // TODO: all related to link
-      whenClosed = 'The eastern door is slightly ajar.';
 //      desc = 'Through the door crack, the neglected kitchen is partially visible.';
       doorDir = EAST;
       doorTo = 'kitchen';
       setAttr(SEARCHABLE);
       addChild(new LivingAreaBucket(this));
+    }
+
+  override function whenClosedF()
+    {
+      var bucket = getChild('bucketLivingArea');
+      if (bucket == null)
+        return TheName + ' is closed.';
+      else return TheName + ' is slightly ajar.';
     }
 
   override function descChildren()
@@ -287,6 +292,15 @@ private class KitchenDoor extends Door
     {
       switch (state.action)
         {
+          case OPEN:
+            var bucket = getChild('bucketLivingArea');
+            if (bucket != null)
+              {
+                bucket.destroy();
+// TODO: sound
+                return "**CLANG!** As you push the door open, the bucket on top of it crashes to the floor with a resounding clang.";
+              }
+            return super.after();
           case SEARCH:
             return 'Upon closely inspecting the door, you discover a bucket on top of it.';
           default:
@@ -373,6 +387,7 @@ private class Kitchen extends Room
       addChild(new PileOfClothes(this));
       addChild(new PileOfClothesStains(this));
       addChild(new RippedBackpack(this));
+      addChild(new KitchenBucket(this));
 /**
 BUCKET
 The door to the west is slightly ajar, and there is a bucket perched precariously on top of it.
@@ -558,7 +573,7 @@ private class StorageArea extends Room
 
 /**
 SEARCH SHELVES
-A closer examination of the shelves uncovers a few bowstrings, a dusty oil flask and two jars of preserved meat, preserved amidst the surrounding chaos.
+A closer examination of the shelves uncovers a few bowstrings, a dusty oil flask and two jars of salted meat, preserved amidst the surrounding chaos.
 
 TRAPDOOR
 The wooden trapdoor, heavy and weathered, is secured by a rusty padlock, a testament to the secrets that lie beneath.
