@@ -257,31 +257,33 @@ Second special case: in a `PushDir` action, the `before` routine must call 
         {
           case CLOSE:
             unsetAttr(OPEN);
+//            setAttr(TOUCHED);
           case DROP:
             moveTo(actor.getRoom());
           case EAT:
             destroy();
           case OPEN:
             setAttr(OPEN);
+//            setAttr(TOUCHED);
           case SEARCH:
             // find stuff - unhide it
-            if (hasAttr(SEARCHABLE))
-              {
-                var tmp = [];
-                for (ch in children)
-                  if (ch.hasAttr(HIDDEN))
-                    {
-                      ch.unsetAttr(HIDDEN);
-                      tmp.push(ch);
-                    }
-                tmpstr = 'Searching through ' + theName +
-                  ', you find ' + stringChildrenPartial(tmp) + '.';
-                setAttr(SEARCHED);
-              }
+            if (!hasAttr(SEARCHABLE))
+              return;
+            var tmp = [];
+            for (ch in children)
+              if (ch.hasAttr(HIDDEN))
+                {
+                  ch.unsetAttr(HIDDEN);
+                  tmp.push(ch);
+                }
+            tmpstr = 'Searching through ' + theName +
+              ', you find ' + stringChildrenPartial(tmp) + '.';
+            setAttr(SEARCHED);
+//            setAttr(TOUCHED);
           case TAKE:
             moveTo(actor);
-            if (!hasAttr(MOVED))
-              setAttr(MOVED);
+            setAttr(MOVED);
+//            setAttr(TOUCHED);
           default:
         }
     }
@@ -394,6 +396,15 @@ The `Search` action is a slightly special case. Here, `after` is called when
       children.push(o);
     }
 
+// returns true if object has child with this id
+  public function hasChild(id: String): Bool
+    {
+      for (ch in children)
+        if (ch.id == id)
+          return true;
+      return false;
+    }
+
 // get child by id
   public function getChild(id: String): Obj
     {
@@ -484,10 +495,11 @@ The `Search` action is a slightly special case. Here, `after` is called when
     {
       if (hasAttr(a))
         {
-          error('Already has attribute ' + a + '.');
+//          error('Already has attribute ' + a + '.');
           return;
         }
       attrs.push(a);
+      // propagates to linked object
       if (linkedObj != null)
         linkedObj.attrs.push(a);
     }
@@ -497,7 +509,7 @@ The `Search` action is a slightly special case. Here, `after` is called when
     {
       if (!hasAttr(a))
         {
-          error('Does not have attribute ' + a + '.');
+//          error('Does not have attribute ' + a + '.');
           return;
         }
       attrs.remove(a);

@@ -161,8 +161,11 @@ private class RightWindow extends Door
           case RUB:
             dusty = false;
             untyped linkedObj.dusty = false;
+// TODO: name + diff name
             return "You wipe the dirt off the right window.";
           case SEARCH:
+            var door: KitchenDoor = cast scene.findObject('kitchenDoor');
+            door.bucketFound();
             var kitchen = scene.findObject('kitchen').asRoom();
             var s = 'You peer through the window:\n';
             s += kitchen.descRoom(true);
@@ -244,6 +247,7 @@ There is nothing interesting on the outside.
 
 private class KitchenDoor extends Door
 {
+  public var bucketMoved: Bool;
   public function new(parent: Obj)
     {
       super(parent);
@@ -252,20 +256,39 @@ private class KitchenDoor extends Door
       linkedName = 'western door';
       names = [ 'east', 'eastern', 'door' ];
       linkedNames = [ 'west', 'western', 'door' ];
-      // TODO: all related to link
 //      desc = 'Through the door crack, the neglected kitchen is partially visible.';
       doorDir = EAST;
       doorTo = 'kitchen';
       setAttr(SEARCHABLE);
-      addChild(new LivingAreaBucket(this));
+      addChild(new DoorBucket(this));
+      bucketMoved = false;
+    }
+
+// called when player finds bucket (from either side)
+// NOTE: this is always called on origin (living area)
+  public function bucketFound()
+    {
+      // origin
+      setAttr(SEARCHED);
+      var bucket = getChild('bucketDoor');
+      if (bucket != null)
+        bucket.unsetAttr(HIDDEN);
+      // link
+      linkedObj.unsetAttr(SEARCHABLE);
+      var bucketLink = linkedObj.getChild('bucketDoor');
+      if (bucketLink != null)
+        bucketLink.unsetAttr(HIDDEN);
     }
 
   override function whenClosedF()
     {
-      var bucket = getChild('bucketLivingArea');
-      if (bucket == null)
+      if (bucketMoved)
         return TheName + ' is closed.';
-      else return TheName + ' is slightly ajar.';
+      var s = TheName + ' is slightly ajar.';
+      if (getRoom().id == 'kitchen' &&
+          hasChild('bucketDoor'))
+        s += ' There is a rusty bucket on top of it.';
+      return s;
     }
 
   override function descChildren()
@@ -274,13 +297,13 @@ private class KitchenDoor extends Door
   override function descF()
     {
       if (hasAttr(OPEN))
-        return 'The door is open.';
-      var bucket = getChild('bucketLivingArea');
-      if (!hasAttr(OPEN) && bucket == null)
-        return 'The door is closed.';
-      var s = 'The door is slightly open leaving a crack.';
-      if (bucket != null)
+        return TheName + ' is open.';
+      if (bucketMoved)
+        return TheName + ' is closed.';
+      var s = TheName + ' is slightly open leaving a crack.';
+      if (!bucketMoved)
         {
+          var bucket = getChild('bucketDoor');
           if (bucket.hasAttr(HIDDEN))
             s += ' There is something on top of it.';
           else s += ' There is a rusty bucket on top of it.';
@@ -293,7 +316,7 @@ private class KitchenDoor extends Door
       switch (state.action)
         {
           case OPEN:
-            var bucket = getChild('bucketLivingArea');
+            var bucket = getChild('bucketDoor');
             if (bucket != null)
               {
                 bucket.destroy();
@@ -309,12 +332,12 @@ private class KitchenDoor extends Door
     }
 }
 
-private class LivingAreaBucket extends Item
+private class DoorBucket extends Item
 {
   public function new(parent: Obj)
     {
       super(parent);
-      id = 'bucketLivingArea';
+      id = 'bucketDoor';
       name = 'rusty bucket';
       names = [ 'rusty', 'bucket' ];
       setAttr(HIDDEN);
@@ -322,7 +345,8 @@ private class LivingAreaBucket extends Item
 
   override function descF()
     {
-      if (hasAttr(CONCEALED))
+      var door: KitchenDoor = cast scene.findObject('kitchenDoor');
+      if (door.bucketMoved)
         return 'It is safely out of the way.';
       else return 'Perched precariously atop the door, the rust-covered bucket is bound to tumble down upon opening.';
     }
@@ -332,7 +356,8 @@ private class LivingAreaBucket extends Item
       switch (state.action)
         {
           case TAKE:
-            if (hasAttr(CONCEALED))
+            var door: KitchenDoor = cast scene.findObject('kitchenDoor');
+            if (door.bucketMoved)
               {
                 p("It's useless.");
                 return false;
@@ -343,13 +368,34 @@ private class LivingAreaBucket extends Item
       return true;
     }
 
+  override function during()
+    {
+      switch (action)
+        {
+          case TAKE:
+            // set flag and move bucket to room
+            untyped parent.bucketMoved = true;
+            untyped parent.linkedObj.bucketMoved = true;
+            parent.setAttr(OPEN);
+            setAttr(CONCEALED);
+
+            // remove linked door bucket
+            var linkedBucket = parent.linkedObj.getChild('bucketDoor');
+            linkedBucket.destroy();
+
+            // move to room
+            moveTo(actor.getRoom());
+          default:
+            super.during();
+        }
+    }
+
   public override function after(): String
     {
       switch (state.action)
         {
+// TODO: more verbs: push, remove, move, etc
           case TAKE:
-            setAttr(CONCEALED);
-            moveTo(actor.getRoom());
             return 'With great caution, you remove the bucket from its perch atop the door and set it aside.';
           default:
             return super.after();
@@ -387,7 +433,6 @@ private class Kitchen extends Room
       addChild(new PileOfClothes(this));
       addChild(new PileOfClothesStains(this));
       addChild(new RippedBackpack(this));
-      addChild(new KitchenBucket(this));
 /**
 BUCKET
 The door to the west is slightly ajar, and there is a bucket perched precariously on top of it.
@@ -398,6 +443,13 @@ The cauldron brims with an assortment of bones, raising the chilling question: a
 BONES
 The whitened bones serve as a warning, highlighting the perils that lie in wait for unwary adventurers.
 **/
+    }
+
+  override function initialF()
+    {
+      var door: KitchenDoor = cast scene.findObject('kitchenDoor');
+      door.bucketFound();
+      return super.initialF();
     }
 }
 
