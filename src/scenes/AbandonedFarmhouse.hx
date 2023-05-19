@@ -75,7 +75,9 @@ private class RightWindow extends Door
       super(parent);
       id = 'rightWindow';
       name = 'right window';
+      linkedName = 'window';
       names = [ 'right', 'window' ];
+      linkedNames = [ 'window' ];
       dusty = true;
       broken = false;
       doorTo = 'kitchen';
@@ -86,7 +88,7 @@ private class RightWindow extends Door
 
   override function descF()
     {
-      var s = 'The window is large enough to climb into.';
+      var s = TheName + ' is large enough to climb through.';
       if (broken)
         s += ' It is completely broken.';
       else
@@ -127,7 +129,7 @@ private class RightWindow extends Door
           case SEARCH:
             if (dusty)
               {
-                p('The window has too much dirt on it to see inside.');
+                p('The window has too much dirt on it to see through.');
                 return false;
               }
           default:
@@ -161,14 +163,19 @@ private class RightWindow extends Door
           case RUB:
             dusty = false;
             untyped linkedObj.dusty = false;
-// TODO: name + diff name
-            return "You wipe the dirt off the right window.";
+            return "You wipe the dirt off " + theName + ".";
           case SEARCH:
-            var door: KitchenDoor = cast scene.findObject('kitchenDoor');
-            door.bucketFound();
-            var kitchen = scene.findObject('kitchen').asRoom();
             var s = 'You peer through the window:\n';
-            s += kitchen.descRoom(true);
+            var roomID = null;
+            if (actor.getRoom().id == 'front')
+              {
+                var door: KitchenDoor = cast scene.findObject('kitchenDoor');
+                door.bucketFound();
+                roomID = 'kitchen';
+              }
+            else roomID = 'front';
+            var room = scene.findObject(roomID).asRoom();
+            s += room.descRoom(true);
             return s;
           default:
             return super.after();
@@ -248,6 +255,7 @@ There is nothing interesting on the outside.
 private class KitchenDoor extends Door
 {
   public var bucketMoved: Bool;
+  public var bucketCrashed: Bool;
   public function new(parent: Obj)
     {
       super(parent);
@@ -262,6 +270,7 @@ private class KitchenDoor extends Door
       setAttr(SEARCHABLE);
       addChild(new DoorBucket(this));
       bucketMoved = false;
+      bucketCrashed = false;
     }
 
 // called when player finds bucket (from either side)
@@ -278,6 +287,27 @@ private class KitchenDoor extends Door
       var bucketLink = linkedObj.getChild('bucketDoor');
       if (bucketLink != null)
         bucketLink.unsetAttr(HIDDEN);
+    }
+
+// called when bucket is taken/removed or falls down
+// NOTE: this is always called on origin (living area)
+  public function bucketRemoved(crashed: Bool)
+    {
+// TODO: xp reward if not crashed
+      // set flag and move bucket to room
+      untyped bucketMoved = true;
+      untyped linkedObj.bucketMoved = true;
+      untyped bucketCrashed = crashed;
+      untyped linkedObj.bucketCrashed = crashed;
+      setAttr(OPEN);
+
+      // remove linked door bucket
+      var linkedBucket = linkedObj.getChild('bucketDoor');
+      linkedBucket.destroy();
+
+      // move to room
+      var bucket = getChild('bucketDoor');
+      bucket.moveTo(actor.getRoom());
     }
 
   override function whenClosedF()
@@ -319,7 +349,9 @@ private class KitchenDoor extends Door
             var bucket = getChild('bucketDoor');
             if (bucket != null)
               {
-                bucket.destroy();
+                var door: KitchenDoor = cast scene.findObject('kitchenDoor');
+                door.bucketFound();
+                door.bucketRemoved(true);
 // TODO: sound
                 return "**CLANG!** As you push the door open, the bucket on top of it crashes to the floor with a resounding clang.";
               }
@@ -341,12 +373,15 @@ private class DoorBucket extends Item
       name = 'rusty bucket';
       names = [ 'rusty', 'bucket' ];
       setAttr(HIDDEN);
+      setAttr(CONCEALED);
     }
 
   override function descF()
     {
       var door: KitchenDoor = cast scene.findObject('kitchenDoor');
-      if (door.bucketMoved)
+      if (door.bucketCrashed)
+        return 'The fallen bucket rests on the floor, a quiet reminder of its recent tumble.';
+      else if (door.bucketMoved)
         return 'It is safely out of the way.';
       else return 'Perched precariously atop the door, the rust-covered bucket is bound to tumble down upon opening.';
     }
@@ -373,18 +408,8 @@ private class DoorBucket extends Item
       switch (action)
         {
           case TAKE:
-            // set flag and move bucket to room
-            untyped parent.bucketMoved = true;
-            untyped parent.linkedObj.bucketMoved = true;
-            parent.setAttr(OPEN);
-            setAttr(CONCEALED);
-
-            // remove linked door bucket
-            var linkedBucket = parent.linkedObj.getChild('bucketDoor');
-            linkedBucket.destroy();
-
-            // move to room
-            moveTo(actor.getRoom());
+            var door: KitchenDoor = cast scene.findObject('kitchenDoor');
+            door.bucketRemoved(false);
           default:
             super.during();
         }
